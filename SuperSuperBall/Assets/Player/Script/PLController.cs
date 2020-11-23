@@ -36,12 +36,12 @@ namespace ssb
 
         #region メンバ変数
 
+        // PLに紐づく描画用GameObject
         private GameObject _FaceGameObj;
+        private GameObject _BodyGameObj;
         private GameObject _BackGameObj;
 
         private GameObject _CurrentMoveObj;
-
-        private LineRenderer _LineRenderer;
 
         private Vector3 _Speed;
 
@@ -56,19 +56,19 @@ namespace ssb
 
         private void Start()
         {
-            _LineRenderer = gameObject.GetComponent<LineRenderer>();
-
+            // -------------------------------
+            // 各種コンポーネント取得
             _FaceGameObj = gameObject.transform.Find("Face").gameObject;
+            _BodyGameObj = gameObject.transform.Find("Body").gameObject;
             _BackGameObj = gameObject.transform.Find("Back").gameObject;
-
-            _CurrentMoveObj = gameObject;
-
-            _Speed = Vector3.zero;
-
-            _State = PLState.Normal;
 
             _CricleCollider = GetComponent<CircleCollider2D>();
             _EdgeCollider   = GetComponent<EdgeCollider2D>();
+
+            // 初期化
+            _CurrentMoveObj = gameObject;
+            _Speed = Vector3.zero;
+            _State = PLState.Normal;
         }
 
         // Update is called once per frame
@@ -141,15 +141,16 @@ namespace ssb
                     break;
             }
 
-            // 伸びてる体の表現
-            _LineRenderer.SetPosition(0, _FaceGameObj.transform.position);
-            _LineRenderer.SetPosition(1, gameObject.transform.position);
+            float distFaceToBody = Vector3.Distance(gameObject.transform.position, _FaceGameObj.transform.position);
 
-            // コライダの切り替え
-            if(Vector3.Distance(_FaceGameObj.transform.position, gameObject.transform.position) < _EdgeCollider.edgeRadius)
+            // 体が伸びていたら。コライダを切り替えて体を描画する
+            if(distFaceToBody < _EdgeCollider.edgeRadius)
             {
                 _CricleCollider.enabled = true;
                 _EdgeCollider.enabled   = false;
+                _BodyGameObj.SetActive(false);
+                _BodyGameObj.transform.localPosition = Vector3.zero;
+                _BodyGameObj.transform.localRotation = Quaternion.identity;
             }
             else
             {
@@ -161,6 +162,11 @@ namespace ssb
                     new Vector2(_FaceGameObj.transform.localPosition.x, _FaceGameObj.transform.localPosition.y)
                 };
                 _EdgeCollider.points = setPoints;
+
+                _BodyGameObj.SetActive(true);
+                _BodyGameObj.transform.localPosition    = _FaceGameObj.transform.localPosition / 2.0f;
+                _BodyGameObj.transform.localRotation    = Quaternion.AngleAxis(Unity2DUtil.GetAngle2D(Vector2.zero, _FaceGameObj.transform.localPosition), Vector3.forward);
+                _BodyGameObj.transform.localScale       = new Vector3(distFaceToBody * 2.0f, 1.0f, 1.0f);
             }
 
             // 速度の減算
