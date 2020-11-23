@@ -30,7 +30,6 @@ namespace ssb
             Hold,
             Shoot,
             Attack,
-            Damage,
         }
 
         #endregion  // enum
@@ -151,17 +150,6 @@ namespace ssb
                         }
                     }
                     break;
-
-                case PLState.Damage:
-
-                    PLShot();
-                    if (_Speed.magnitude < 7.0f)
-                    {
-                        _Speed = Vector3.zero;
-                        _State = PLState.Normal;
-                    }
-                    break;
-
             }
 
             float distFaceToBody = Vector3.Distance(gameObject.transform.position, _FaceGameObj.transform.position);
@@ -213,6 +201,8 @@ namespace ssb
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
+            bool isDeath = false;
+
             // 敵に当たる
             if(collision.gameObject.GetComponent<EnemyBehaviour>() != null)
             {
@@ -220,26 +210,26 @@ namespace ssb
                 {
                     _Speed = Vector3.zero;
                 }
-                else if(_State != PLState.Damage)
+                else
                 {
-                    // ノックバック
-                    _State = PLState.Damage;
-                    _Speed = (gameObject.transform.position - collision.gameObject.transform.position).normalized * 10.0f;
-                    SEManager.Instance.playSE(SEManager.SEName.Hit);
-
-                    Debug.Log("knockback");
+                    isDeath = true;
                 }
             }
             // 敵の弾に当たる
             else if (collision.gameObject.GetComponent<EnemyShot>() != null)
             {
-                if (_State != PLState.Attack && _State != PLState.Damage)
+                if (_State != PLState.Attack)
                 {
-                    SEManager.Instance.playSE(SEManager.SEName.Hit);
+                    isDeath = true;
                 }
             }
 
-
+            // 死亡w
+            if(isDeath)
+            {
+                SEManager.Instance.playSE(SEManager.SEName.Hit);
+                Debug.Log("Death");
+            }
         }
 
         #endregion // 衝突
