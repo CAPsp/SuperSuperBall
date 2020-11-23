@@ -20,6 +20,8 @@ namespace ssb
         // 自由がきくようになる速度
         private static readonly float NOT_BIND_SPEED_LIMIT = 10.0f;
 
+        private static readonly float MUTEKI_TIME_SEC = 2.0f;
+
         #endregion // 定数
 
         #region enum
@@ -37,7 +39,11 @@ namespace ssb
 
         #region プロパティ
 
+        // 現在のPLの状態
         public PLState _State { private set; get; }
+
+        // 無敵中の時間(setは無敵時間が切れたときのみ行える)
+        public float _MutekiTimeSec { private set; get; }
 
         #endregion
 
@@ -73,8 +79,9 @@ namespace ssb
             _EdgeCollider   = GetComponent<EdgeCollider2D>();
 
             // 初期化
-            _Speed = Vector3.zero;
-            _State = PLState.Normal;
+            _Speed                  = Vector3.zero;
+            _State                  = PLState.Normal;
+            _MutekiTimeSec          = 0f;
         }
 
         // Update is called once per frame
@@ -89,7 +96,8 @@ namespace ssb
 
                     PLMove(x, y);
 
-                    if (InputManager.Instance.Hold == InputManager.KeyState.Down)
+                    if (InputManager.Instance.Hold == InputManager.KeyState.Down
+                        && _MutekiTimeSec <= 0.0f)
                     {
                         _FixedPos = gameObject.transform.position;
                         _State = PLState.Hold;
@@ -150,6 +158,7 @@ namespace ssb
                         if (_Speed.magnitude < NOT_BIND_SPEED_LIMIT)
                         {
                             _Speed = Vector3.zero;
+                            _MutekiTimeSec = (_MutekiTimeSec <= 0f) ? MUTEKI_TIME_SEC : _MutekiTimeSec;
                             _State = PLState.Normal;
                         }
                     }
@@ -163,7 +172,7 @@ namespace ssb
                         Destroy(gameObject);
                     }
 
-                    return;
+                    break;
             }
 
             float distFaceToBody = Vector3.Distance(_BackGameObj.transform.position, gameObject.transform.position);
@@ -201,6 +210,27 @@ namespace ssb
             {
                 _Speed = Vector3.zero;
             }
+
+            if(_MutekiTimeSec > 0.0f)
+            {
+                _MutekiTimeSec -= Time.deltaTime;
+                
+                if(_MutekiTimeSec <= 0.0f)  // 無敵中消滅
+                {
+                    foreach (var sprite in gameObject.GetComponentsInChildren<SpriteRenderer>())
+                    {
+                        sprite.enabled = true;
+                    }
+                }
+                else    // 無敵中は体が明滅する
+                {
+                    bool isEnabled = ((int)(_MutekiTimeSec * 10f) % 2) == 0;
+                    foreach (var sprite in gameObject.GetComponentsInChildren<SpriteRenderer>())
+                    {
+                        sprite.enabled = isEnabled;
+                    }
+                }
+            }
         }
 
         private void OnGUI()
@@ -223,6 +253,7 @@ namespace ssb
                 if (_State == PLState.Attack)
                 {
                     _Speed = Vector3.zero;
+                    _MutekiTimeSec = (_MutekiTimeSec <= 0f) ? MUTEKI_TIME_SEC : _MutekiTimeSec;
                 }
                 else if(_State != PLState.Death)
                 {
@@ -239,10 +270,11 @@ namespace ssb
             }
 
             // 死亡w
-            if(isDeath)
+            if(isDeath && _MutekiTimeSec <= 0.0f)
             {
                 SEManager.Instance.playSE(SEManager.SEName.PLDeath);
                 _State = PLState.Death;
+                _BackGameObj.transform.localPosition = Vector3.zero;
                 _BodyGameObj.SetActive(false);
                 _BackGameObj.SetActive(false);
                 _Animator.SetBool("isDeath", true);

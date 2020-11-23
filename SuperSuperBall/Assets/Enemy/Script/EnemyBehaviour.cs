@@ -38,17 +38,20 @@ namespace ssb
             _ShotGenTimerSec += Time.deltaTime;
             if (_ShotGenTimerSec >= SHOT_GEN_INTERVAL_SEC)
             {
-                Vector3 plPos = GameObject.FindGameObjectWithTag("Player").transform.position;
-                Vector3 angle = ((plPos + Unity2DUtil.genRandomVector2(3.0f)) - gameObject.transform.position).normalized;
+                if (GameObject.FindGameObjectWithTag("Player") != null)
+                {
+                    Vector3 plPos = GameObject.FindGameObjectWithTag("Player").transform.position;
+                    Vector3 angle = ((plPos + Unity2DUtil.genRandomVector2(3.0f)) - gameObject.transform.position).normalized;
 
-                EnemyShotManager.Instance.shotGen
-                    (
-                        new Vector2(gameObject.transform.position.x, gameObject.transform.position.y),
-                        new Vector2(angle.x, angle.y),
-                        3.0f
-                    );
+                    EnemyShotManager.Instance.shotGen
+                        (
+                            new Vector2(gameObject.transform.position.x, gameObject.transform.position.y),
+                            new Vector2(angle.x, angle.y),
+                            3.0f
+                        );
 
-                _ShotGenTimerSec = 0.0f;
+                    _ShotGenTimerSec = 0.0f;
+                }
             }
 
         }
