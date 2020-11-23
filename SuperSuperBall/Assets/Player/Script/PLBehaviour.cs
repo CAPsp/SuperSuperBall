@@ -241,48 +241,6 @@ namespace ssb
 
         #endregion // 基本
 
-        #region 衝突
-
-        private void OnTriggerEnter2D(Collider2D collision)
-        {
-            bool isDeath = false;
-
-            // 敵に当たる
-            if(collision.gameObject.GetComponent<EnemyBehaviour>() != null)
-            {
-                if (_State == PLState.Attack)
-                {
-                    _Speed = Vector3.zero;
-                    _MutekiTimeSec = (_MutekiTimeSec <= 0f) ? MUTEKI_TIME_SEC : _MutekiTimeSec;
-                }
-                else if(_State != PLState.Death)
-                {
-                    isDeath = true;
-                }
-            }
-            // 敵の弾に当たる
-            else if (collision.gameObject.GetComponent<EnemyShot>() != null)
-            {
-                if (_State != PLState.Attack && _State != PLState.Death)
-                {
-                    isDeath = true;
-                }
-            }
-
-            // 死亡w
-            if(isDeath && _MutekiTimeSec <= 0.0f)
-            {
-                SEManager.Instance.playSE(SEManager.SEName.PLDeath);
-                _State = PLState.Death;
-                _BackGameObj.transform.localPosition = Vector3.zero;
-                _BodyGameObj.SetActive(false);
-                _BackGameObj.SetActive(false);
-                _Animator.SetBool("isDeath", true);
-            }
-        }
-
-        #endregion // 衝突
-
         #region 非公開メソッド
 
         // 移動
@@ -358,7 +316,43 @@ namespace ssb
             gameObject.transform.position = nextPos;
         }
 
+        // 死亡時の処理
+        private void death()
+        {
+            SEManager.Instance.playSE(SEManager.SEName.PLDeath);
+            _State = PLState.Death;
+            _BackGameObj.transform.localPosition = Vector3.zero;
+            _BodyGameObj.SetActive(false);
+            _BackGameObj.SetActive(false);
+            _Animator.SetBool("isDeath", true);
+        }
+
         #endregion // 非公開メソッド
+
+        #region 公開メソッド
+
+        public Vector3 getSpeed()
+        {
+            return _Speed;
+        }
+
+        public void hit(bool isEnemy = false)
+        {
+            // 敵に直接あたった場合
+            if(isEnemy && _State == PLState.Attack)
+            {
+                _Speed = Vector3.zero;
+                _MutekiTimeSec = (_MutekiTimeSec <= 0f) ? MUTEKI_TIME_SEC : _MutekiTimeSec;
+            }
+
+            if ((_State != PLState.Attack && _State != PLState.Death) &&
+                 _MutekiTimeSec <= 0.0f)
+            {
+                death();
+            }
+        }
+
+        #endregion
     }
 
 }

@@ -1134,6 +1134,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _Hit: {fileID: 8300000, guid: 7a5c61a9d4cc8084fae2890b1c536ef1, type: 3}
   _PLDeath: {fileID: 8300000, guid: e488ba9f9132ee848b8aeed3bb57c51f, type: 3}
+  _ShotDelete: {fileID: 8300000, guid: 056e456f443e9064cabe9306e6c21fdc, type: 3}
 --- !u!1 &1387584117
 GameObject:
   m_ObjectHideFlags: 0

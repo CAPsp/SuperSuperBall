@@ -13,6 +13,7 @@ namespace ssb
         {
             Hit,
             PLDeath,
+            ShotDelete,
         }
 
         #endregion // enum
@@ -20,8 +21,11 @@ namespace ssb
         #region フィールド
 
         [SerializeField]
-        public AudioClip _Hit;
-        public AudioClip _PLDeath;
+        private AudioClip _Hit;
+        [SerializeField]
+        private AudioClip _PLDeath;
+        [SerializeField]
+        private AudioClip _ShotDelete;
 
         private AudioSource _AudioSource;
 
@@ -45,6 +49,7 @@ namespace ssb
             {
                 case SEName.Hit:        _AudioSource.clip = _Hit;       break;
                 case SEName.PLDeath:    _AudioSource.clip = _PLDeath;   break;
+                case SEName.ShotDelete: _AudioSource.clip = _ShotDelete; break;
             }
             
             _AudioSource.Play();

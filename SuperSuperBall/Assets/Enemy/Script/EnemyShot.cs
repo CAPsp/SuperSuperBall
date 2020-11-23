@@ -29,8 +29,18 @@ namespace ssb
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            // 消える
-            EnemyShotManager.Instance.shotDelete(gameObject);
+            // PLに当たった場合
+            if(collision.gameObject.GetComponent<PLBehaviour>() != null)
+            {
+                collision.gameObject.GetComponent<PLBehaviour>().hit();
+
+                // 攻撃中のPLに当たったら消える
+                if (collision.gameObject.GetComponent<PLBehaviour>()._State == PLBehaviour.PLState.Attack)
+                {
+                    SEManager.Instance.playSE(SEManager.SEName.ShotDelete);
+                    EnemyShotManager.Instance.shotDelete(gameObject);
+                }
+            }
         }
 
         #endregion // 衝突
