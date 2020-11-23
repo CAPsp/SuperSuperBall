@@ -224,7 +224,7 @@ namespace ssb
                 {
                     _Speed = Vector3.zero;
                 }
-                else
+                else if(_State != PLState.Death)
                 {
                     isDeath = true;
                 }
@@ -232,7 +232,7 @@ namespace ssb
             // 敵の弾に当たる
             else if (collision.gameObject.GetComponent<EnemyShot>() != null)
             {
-                if (_State != PLState.Attack)
+                if (_State != PLState.Attack && _State != PLState.Death)
                 {
                     isDeath = true;
                 }
@@ -241,7 +241,7 @@ namespace ssb
             // 死亡w
             if(isDeath)
             {
-                SEManager.Instance.playSE(SEManager.SEName.Hit);
+                SEManager.Instance.playSE(SEManager.SEName.PLDeath);
                 _State = PLState.Death;
                 _BodyGameObj.SetActive(false);
                 _BackGameObj.SetActive(false);

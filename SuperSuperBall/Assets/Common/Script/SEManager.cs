@@ -12,6 +12,7 @@ namespace ssb
         public enum SEName
         {
             Hit,
+            PLDeath,
         }
 
         #endregion // enum
@@ -19,7 +20,8 @@ namespace ssb
         #region フィールド
 
         [SerializeField]
-        public AudioClip testClip;
+        public AudioClip _Hit;
+        public AudioClip _PLDeath;
 
         private AudioSource _AudioSource;
 
@@ -39,7 +41,12 @@ namespace ssb
         // 引数に渡されたＳＥを鳴らす
         public void playSE(SEName name)
         {
-            _AudioSource.clip = testClip;
+            switch(name)
+            {
+                case SEName.Hit:        _AudioSource.clip = _Hit;       break;
+                case SEName.PLDeath:    _AudioSource.clip = _PLDeath;   break;
+            }
+            
             _AudioSource.Play();
         }
 
