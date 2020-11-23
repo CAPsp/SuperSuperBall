@@ -10,13 +10,15 @@ namespace ssb
 
         #region 定数
 
-        private static readonly float SHOT_GEN_INTERVAL_SEC = 1.0f;
+        private static readonly float SHOT_GEN_INTERVAL_SEC = 0.5f;
 
         #endregion
 
         #region フィールド
 
         private float _ShotGenTimerSec; // 弾生成に使用するタイマー
+
+        private int _Hp;
 
         #endregion
 
@@ -26,6 +28,7 @@ namespace ssb
         {
             // 初期化
             _ShotGenTimerSec = 0.0f;
+            _Hp = 2;
         }
 
         // Update is called once per frame
@@ -36,7 +39,7 @@ namespace ssb
             if (_ShotGenTimerSec >= SHOT_GEN_INTERVAL_SEC)
             {
                 Vector3 plPos = GameObject.FindGameObjectWithTag("Player").transform.position;
-                Vector3 angle = (plPos - gameObject.transform.position).normalized;
+                Vector3 angle = ((plPos + Unity2DUtil.genRandomVector2(3.0f)) - gameObject.transform.position).normalized;
 
                 EnemyShotManager.Instance.shotGen
                     (
@@ -51,6 +54,37 @@ namespace ssb
         }
 
         #endregion // 基本
+
+        #region 衝突
+
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            // PLに当たった場合
+            if(collision.gameObject.GetComponent<PLBehaviour>() != null)
+            {
+                // PLから攻撃されたらHPが減る
+                if (collision.gameObject.GetComponent<PLBehaviour>()._State == PLBehaviour.PLState.Attack)
+                {
+                    SEManager.Instance.playSE(SEManager.SEName.Hit);
+                    damage(1);
+                }
+            }
+        }
+
+        #endregion // 衝突
+
+        #region 非公開メソッド
+
+        private void damage(int damage)
+        {
+            _Hp -= damage;
+            if(_Hp <= 0)
+            {
+                Destroy(this.gameObject);
+            }
+        }
+
+        #endregion
     }
 
 }

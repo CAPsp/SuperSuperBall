@@ -5,13 +5,13 @@ using UnityEngine;
 namespace ssb
 {
 
-    public class SoundManager : SingletonMonoBehaviour<SoundManager>
+    public class BGMManager : SingletonMonoBehaviour<BGMManager>
     {
         #region enum
 
-        public enum SEName
+        public enum BGMName
         {
-            Hit,
+            Main,
         }
 
         #endregion // enum
@@ -37,7 +37,7 @@ namespace ssb
         #region 公開メソッド
 
         // 引数に渡されたＳＥを鳴らす
-        public void playSE(SEName name)
+        public void playSE(BGMName name)
         {
             _AudioSource.clip = testClip;
             _AudioSource.Play();

@@ -6,7 +6,7 @@ namespace ssb
 {
 
     // PLの操作
-    public class PLController : MonoBehaviour
+    public class PLBehaviour : MonoBehaviour
     {
         #region 定数
 
@@ -29,10 +29,17 @@ namespace ssb
             Normal,
             Hold,
             Shoot,
-            Free,
+            Attack,
+            Damage,
         }
 
         #endregion  // enum
+
+        #region プロパティ
+
+        public PLState _State { private set; get; }
+
+        #endregion
 
         #region メンバ変数
 
@@ -44,8 +51,6 @@ namespace ssb
         private GameObject _CurrentMoveObj;
 
         private Vector3 _Speed;
-
-        private PLState _State;
 
         private CircleCollider2D _CricleCollider;
         private EdgeCollider2D _EdgeCollider;
@@ -86,7 +91,7 @@ namespace ssb
                     if (InputManager.Instance.Hold == InputManager.KeyState.Down)
                     {
                         _CurrentMoveObj = _FaceGameObj;
-                        setState(PLState.Hold);
+                        _State = PLState.Hold;
                     }
                     break;
 
@@ -101,7 +106,13 @@ namespace ssb
                     if (InputManager.Instance.Hold == InputManager.KeyState.Up)
                     {
                         _Speed = (gameObject.transform.position - _FaceGameObj.transform.position) * MOVE_SPEED * MOVE_SPEED;
-                        setState(PLState.Shoot);
+                        _State = PLState.Shoot;
+                    }
+                    else if(InputManager.Instance.isDecide)
+                    {
+                        _FaceGameObj.transform.position = gameObject.transform.position;
+                        _CurrentMoveObj = gameObject;
+                        _State = PLState.Normal;
                     }
                     break;
 
@@ -115,17 +126,18 @@ namespace ssb
                     {
                         _FaceGameObj.transform.position = gameObject.transform.position;
                         _CurrentMoveObj = gameObject;
-                        setState(PLState.Free);
+                        _State = PLState.Attack;
                     }
 
                     if(_Speed.magnitude < NOT_BIND_SPEED_LIMIT)
                     {
+                        _FaceGameObj.transform.position = gameObject.transform.position;
                         _CurrentMoveObj = gameObject;
-                         setState(PLState.Normal);
+                        _State = PLState.Normal;
                     }
                     break;
 
-                case PLState.Free:
+                case PLState.Attack:
 
                     PLShot();
 
@@ -135,10 +147,21 @@ namespace ssb
                         if (_Speed.magnitude < NOT_BIND_SPEED_LIMIT)
                         {
                             _Speed = Vector3.zero;
-                            setState(PLState.Normal);
+                            _State = PLState.Normal;
                         }
                     }
                     break;
+
+                case PLState.Damage:
+
+                    PLShot();
+                    if (_Speed.magnitude < 7.0f)
+                    {
+                        _Speed = Vector3.zero;
+                        _State = PLState.Normal;
+                    }
+                    break;
+
             }
 
             float distFaceToBody = Vector3.Distance(gameObject.transform.position, _FaceGameObj.transform.position);
@@ -165,7 +188,7 @@ namespace ssb
 
                 _BodyGameObj.SetActive(true);
                 _BodyGameObj.transform.localPosition    = _FaceGameObj.transform.localPosition / 2.0f;
-                _BodyGameObj.transform.localRotation    = Quaternion.AngleAxis(Unity2DUtil.GetAngle2D(Vector2.zero, _FaceGameObj.transform.localPosition), Vector3.forward);
+                _BodyGameObj.transform.localRotation    = Quaternion.AngleAxis(Unity2DUtil.CalcAngle2D(Vector2.zero, _FaceGameObj.transform.localPosition), Vector3.forward);
                 _BodyGameObj.transform.localScale       = new Vector3(distFaceToBody * 2.0f, 1.0f, 1.0f);
             }
 
@@ -190,15 +213,36 @@ namespace ssb
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            // 敵の弾に当たる
-            if(_State == PLState.Normal || _State == PLState.Hold)
+            // 敵に当たる
+            if(collision.gameObject.GetComponent<EnemyBehaviour>() != null)
             {
-                SoundManager.Instance.playSE(SoundManager.SEName.Hit);
+                if (_State == PLState.Attack)
+                {
+                    _Speed = Vector3.zero;
+                }
+                else if(_State != PLState.Damage)
+                {
+                    // ノックバック
+                    _State = PLState.Damage;
+                    _Speed = (gameObject.transform.position - collision.gameObject.transform.position).normalized * 10.0f;
+                    SEManager.Instance.playSE(SEManager.SEName.Hit);
+
+                    Debug.Log("knockback");
+                }
             }
+            // 敵の弾に当たる
+            else if (collision.gameObject.GetComponent<EnemyShot>() != null)
+            {
+                if (_State != PLState.Attack && _State != PLState.Damage)
+                {
+                    SEManager.Instance.playSE(SEManager.SEName.Hit);
+                }
+            }
+
+
         }
 
         #endregion // 衝突
-
 
         #region 非公開メソッド
 
@@ -273,11 +317,6 @@ namespace ssb
             }
 
             _CurrentMoveObj.transform.position = nextPos;
-        }
-
-        private void setState(PLState state)
-        {
-            _State = state;
         }
 
         #endregion // 非公開メソッド
