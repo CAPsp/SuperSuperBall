@@ -30,6 +30,7 @@ namespace ssb
             Hold,
             Shoot,
             Attack,
+            Death,
         }
 
         #endregion  // enum
@@ -42,12 +43,13 @@ namespace ssb
 
         #region メンバ変数
 
-        // PLに紐づく描画用GameObject
-        private GameObject _FaceGameObj;
+        // PLの子要素に存在する描画用GameObject
         private GameObject _BodyGameObj;
         private GameObject _BackGameObj;
 
-        private GameObject _CurrentMoveObj;
+        private Animator _Animator;
+
+        private Vector3 _FixedPos;  // 力をためるときのポジション
 
         private Vector3 _Speed;
 
@@ -62,15 +64,15 @@ namespace ssb
         {
             // -------------------------------
             // 各種コンポーネント取得
-            _FaceGameObj = gameObject.transform.Find("Face").gameObject;
             _BodyGameObj = gameObject.transform.Find("Body").gameObject;
             _BackGameObj = gameObject.transform.Find("Back").gameObject;
+
+            _Animator = gameObject.GetComponent<Animator>();
 
             _CricleCollider = GetComponent<CircleCollider2D>();
             _EdgeCollider   = GetComponent<EdgeCollider2D>();
 
             // 初期化
-            _CurrentMoveObj = gameObject;
             _Speed = Vector3.zero;
             _State = PLState.Normal;
         }
@@ -89,28 +91,30 @@ namespace ssb
 
                     if (InputManager.Instance.Hold == InputManager.KeyState.Down)
                     {
-                        _CurrentMoveObj = _FaceGameObj;
+                        _FixedPos = gameObject.transform.position;
                         _State = PLState.Hold;
                     }
                     break;
 
                 case PLState.Hold:
 
-                    float dist = Vector3.Distance(gameObject.transform.position, _FaceGameObj.transform.position);
+                    float dist = Vector3.Distance(_FixedPos, gameObject.transform.position);
                     dist += 1.0f;
                     dist *= dist;
 
                     PLMove(x / dist, y / dist);
 
+                    // 残した体の位置を調整
+                    _BackGameObj.transform.localPosition = _FixedPos - gameObject.transform.position;
+
                     if (InputManager.Instance.Hold == InputManager.KeyState.Up)
                     {
-                        _Speed = (gameObject.transform.position - _FaceGameObj.transform.position) * MOVE_SPEED * MOVE_SPEED;
+                        _Speed = (_FixedPos - gameObject.transform.position) * MOVE_SPEED * MOVE_SPEED;
                         _State = PLState.Shoot;
                     }
                     else if(InputManager.Instance.isDecide)
                     {
-                        _FaceGameObj.transform.position = gameObject.transform.position;
-                        _CurrentMoveObj = gameObject;
+                        _BackGameObj.transform.localPosition = Vector3.zero;
                         _State = PLState.Normal;
                     }
                     break;
@@ -119,19 +123,19 @@ namespace ssb
 
                     PLShot();
 
-                    // 基点を追い越したら基点がくっついてくるようになる
-                    Vector3 diff = gameObject.transform.position - _FaceGameObj.transform.position;
+                    _BackGameObj.transform.localPosition = _FixedPos - gameObject.transform.position;
+
+                    // 基点を追い越したら残した体がくっついてくるようになる
+                    Vector3 diff = _FixedPos - gameObject.transform.position;
                     if (Mathf.Sign(_Speed.x) != Mathf.Sign(diff.x) || Mathf.Sign(_Speed.y) != Mathf.Sign(diff.y))
                     {
-                        _FaceGameObj.transform.position = gameObject.transform.position;
-                        _CurrentMoveObj = gameObject;
+                        _BackGameObj.transform.localPosition = Vector3.zero;
                         _State = PLState.Attack;
                     }
 
                     if(_Speed.magnitude < NOT_BIND_SPEED_LIMIT)
                     {
-                        _FaceGameObj.transform.position = gameObject.transform.position;
-                        _CurrentMoveObj = gameObject;
+                        _BackGameObj.transform.localPosition = Vector3.zero;
                         _State = PLState.Normal;
                     }
                     break;
@@ -150,9 +154,19 @@ namespace ssb
                         }
                     }
                     break;
+
+                case PLState.Death:
+                    // アニメーション処理が終わったらゲームオブジェクト破棄
+                    if (_Animator.GetCurrentAnimatorStateInfo(0).IsName("PL_death") &&
+                        _Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+                    {
+                        Destroy(gameObject);
+                    }
+
+                    return;
             }
 
-            float distFaceToBody = Vector3.Distance(gameObject.transform.position, _FaceGameObj.transform.position);
+            float distFaceToBody = Vector3.Distance(_BackGameObj.transform.position, gameObject.transform.position);
 
             // 体が伸びていたら。コライダを切り替えて体を描画する
             if(distFaceToBody < _EdgeCollider.edgeRadius)
@@ -170,13 +184,13 @@ namespace ssb
 
                 Vector2[] setPoints = new Vector2[]{
                     Vector2.zero,
-                    new Vector2(_FaceGameObj.transform.localPosition.x, _FaceGameObj.transform.localPosition.y)
+                    new Vector2(_BackGameObj.transform.localPosition.x, _BackGameObj.transform.localPosition.y)
                 };
                 _EdgeCollider.points = setPoints;
 
                 _BodyGameObj.SetActive(true);
-                _BodyGameObj.transform.localPosition    = _FaceGameObj.transform.localPosition / 2.0f;
-                _BodyGameObj.transform.localRotation    = Quaternion.AngleAxis(Unity2DUtil.CalcAngle2D(Vector2.zero, _FaceGameObj.transform.localPosition), Vector3.forward);
+                _BodyGameObj.transform.localPosition    = _BackGameObj.transform.localPosition / 2.0f;
+                _BodyGameObj.transform.localRotation    = Quaternion.AngleAxis(Unity2DUtil.CalcAngle2D(Vector2.zero, _BackGameObj.transform.localPosition), Vector3.forward);
                 _BodyGameObj.transform.localScale       = new Vector3(distFaceToBody * 2.0f, 1.0f, 1.0f);
             }
 
@@ -191,8 +205,8 @@ namespace ssb
 
         private void OnGUI()
         {
-            GUI.Label(new Rect(0, 0, 100, 50), _Speed.ToString());
-            GUI.Label(new Rect(0, 50, 100, 50), _State.ToString());
+            GUI.Label(new Rect(0, 0, 100, 50), _Speed.ToString(), GUI.skin.box);
+            GUI.Label(new Rect(0, 50, 100, 50), _State.ToString(), GUI.skin.box);
         }
 
         #endregion // 基本
@@ -228,7 +242,10 @@ namespace ssb
             if(isDeath)
             {
                 SEManager.Instance.playSE(SEManager.SEName.Hit);
-                Debug.Log("Death");
+                _State = PLState.Death;
+                _BodyGameObj.SetActive(false);
+                _BackGameObj.SetActive(false);
+                _Animator.SetBool("isDeath", true);
             }
         }
 
@@ -239,7 +256,7 @@ namespace ssb
         // 移動
         private void PLMove(float x, float y)
         {
-            Vector3 nextPos = _CurrentMoveObj.transform.position;
+            Vector3 nextPos = gameObject.transform.position;
             nextPos += new Vector3(x, y, 0f) * 0.05f;
 
 
@@ -268,13 +285,13 @@ namespace ssb
                 }
             }
 
-            _CurrentMoveObj.transform.position = nextPos;
+            gameObject.transform.position = nextPos;
         }
 
         // ショット
         private void PLShot()
         {
-            Vector3 nextPos = _CurrentMoveObj.transform.position;
+            Vector3 nextPos = gameObject.transform.position;
             nextPos += _Speed * Time.deltaTime;
 
             // 画面外に出た場合は跳ね返る
@@ -306,7 +323,7 @@ namespace ssb
                 }
             }
 
-            _CurrentMoveObj.transform.position = nextPos;
+            gameObject.transform.position = nextPos;
         }
 
         #endregion // 非公開メソッド
