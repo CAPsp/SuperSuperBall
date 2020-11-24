@@ -6,8 +6,14 @@ namespace ssb
 {
 
     // 敵の弾
-    public class EnemyShot : MonoBehaviour
+    public class EnemyShot : CharaBaseBehaviour
     {
+
+        #region プロパティ
+
+        public override ObjType _Type { protected set; get; } = ObjType.Enemy;
+
+        #endregion // プロパティ
 
         #region フィールド
 

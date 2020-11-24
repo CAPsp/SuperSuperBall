@@ -6,7 +6,7 @@ namespace ssb
 {
 
     // PLの操作
-    public class PLBehaviour : MonoBehaviour
+    public class PLBehaviour : CharaBaseBehaviour
     {
         #region 定数
 
@@ -39,13 +39,15 @@ namespace ssb
 
         #region プロパティ
 
+        public override ObjType _Type { protected set; get; } = ObjType.Player;
+
         // 現在のPLの状態
         public PLState _State { private set; get; }
 
         // 無敵中の時間(setは無敵時間が切れたときのみ行える)
         public float _MutekiTimeSec { private set; get; }
 
-        #endregion
+        #endregion // プロパティ
 
         #region メンバ変数
 

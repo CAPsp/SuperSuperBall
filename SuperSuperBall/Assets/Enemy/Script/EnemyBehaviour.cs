@@ -5,7 +5,8 @@ using UnityEngine;
 namespace ssb
 {
 
-    public class EnemyBehaviour : MonoBehaviour
+    // 敵の操作
+    public class EnemyBehaviour : CharaBaseBehaviour
     {
 
         #region 定数
@@ -14,7 +15,15 @@ namespace ssb
 
         private static readonly float SPEED_RESISTANCE = 1.0f;
 
-        #endregion
+        private static readonly float NOT_COLLIDE_TIME_SEC = 0.1f;
+
+        #endregion // 定数
+
+        #region プロパティ
+
+        public override ObjType _Type { protected set; get; } = ObjType.Enemy;
+
+        #endregion // プロパティ
 
         #region フィールド
 
@@ -24,7 +33,9 @@ namespace ssb
 
         private Vector3 _Speed;
 
-        #endregion
+        private float _NotCollideTimeSec = 0.0f;
+
+        #endregion // フィールド
 
         #region 基本
 
@@ -39,6 +50,15 @@ namespace ssb
         // Update is called once per frame
         private void Update()
         {
+            if(_NotCollideTimeSec > 0f)
+            {
+                _NotCollideTimeSec -= Time.deltaTime;
+                if(_NotCollideTimeSec <= 0f)
+                {
+                    GetComponent<BoxCollider2D>().enabled = true;
+                }
+            }
+
             Vector3 nextPos = gameObject.transform.position;
             nextPos += _Speed * Time.deltaTime;
 
@@ -128,6 +148,9 @@ namespace ssb
                 _Speed = collision.gameObject.GetComponent<EnemyBehaviour>()._Speed;
                 collision.gameObject.GetComponent<EnemyBehaviour>()._Speed = currentSpeed;
             }
+
+            _NotCollideTimeSec = NOT_COLLIDE_TIME_SEC;
+            GetComponent<BoxCollider2D>().enabled = false;
         }
 
         #endregion // 衝突

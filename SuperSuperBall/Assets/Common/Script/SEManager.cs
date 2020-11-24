@@ -21,11 +21,11 @@ namespace ssb
         #region フィールド
 
         [SerializeField]
-        private AudioClip _Hit;
+        private AudioClip _Hit          = null;
         [SerializeField]
-        private AudioClip _PLDeath;
+        private AudioClip _PLDeath      = null;
         [SerializeField]
-        private AudioClip _ShotDelete;
+        private AudioClip _ShotDelete   = null;
 
         private AudioSource _AudioSource;
 
