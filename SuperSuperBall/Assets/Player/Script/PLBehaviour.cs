@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using ssb.state;
+
 namespace ssb
 {
 
@@ -24,25 +26,9 @@ namespace ssb
 
         #endregion // 定数
 
-        #region enum
-
-        public enum PLState
-        {
-            Normal,
-            Hold,
-            Shoot,
-            Attack,
-            Death,
-        }
-
-        #endregion  // enum
-
         #region プロパティ
 
         public override ObjType _Type { protected set; get; } = ObjType.Player;
-
-        // 現在のPLの状態
-        public PLState _State { private set; get; }
 
         // 無敵中の時間(setは無敵時間が切れたときのみ行える)
         public float _MutekiTimeSec { private set; get; }
@@ -58,8 +44,6 @@ namespace ssb
         private Animator _Animator;
 
         private Vector3 _FixedPos;  // 力をためるときのポジション
-
-        private Vector3 _Speed;
 
         private CircleCollider2D _CricleCollider;
         private EdgeCollider2D _EdgeCollider;
@@ -81,9 +65,9 @@ namespace ssb
             _EdgeCollider   = GetComponent<EdgeCollider2D>();
 
             // 初期化
-            _Speed                  = Vector3.zero;
-            _State                  = PLState.Normal;
-            _MutekiTimeSec          = 0f;
+            _Speed         = Vector3.zero;
+            _StateMachine  = new StateMachine(new PLStateNormal(this), this);
+            _MutekiTimeSec = 0f;
         }
 
         // Update is called once per frame
@@ -92,6 +76,8 @@ namespace ssb
             float x = InputManager.Instance.axisX;
             float y = InputManager.Instance.axisY;
 
+            _StateMachine.update();
+            /*
             switch (_State)
             {
                 case PLState.Normal:
@@ -176,6 +162,7 @@ namespace ssb
 
                     break;
             }
+            */
 
             float distFaceToBody = Vector3.Distance(_BackGameObj.transform.position, gameObject.transform.position);
 
@@ -206,8 +193,8 @@ namespace ssb
             }
 
             // 速度の減算
-            _Speed.x -= (SPEED_RESISTANCE * Time.deltaTime * _Speed.x);
-            _Speed.y -= (SPEED_RESISTANCE * Time.deltaTime * _Speed.y);
+            //_Speed.x -= (SPEED_RESISTANCE * Time.deltaTime * _Speed.x);
+            //_Speed.y -= (SPEED_RESISTANCE * Time.deltaTime * _Speed.y);
             if (_Speed.sqrMagnitude < 0.1f)
             {
                 _Speed = Vector3.zero;
@@ -238,7 +225,7 @@ namespace ssb
         private void OnGUI()
         {
             GUI.Label(new Rect(0, 0, 100, 50), _Speed.ToString(), GUI.skin.box);
-            GUI.Label(new Rect(0, 50, 100, 50), _State.ToString(), GUI.skin.box);
+            GUI.Label(new Rect(0, 50, 100, 50), _StateMachine._CurrentState.ToString(), GUI.skin.box);
         }
 
         #endregion // 基本
@@ -246,7 +233,7 @@ namespace ssb
         #region 非公開メソッド
 
         // 移動
-        private void PLMove(float x, float y)
+        public void move(float x, float y)
         {
             Vector3 nextPos = gameObject.transform.position;
             nextPos += new Vector3(x, y, 0f) * 0.05f;
@@ -281,7 +268,7 @@ namespace ssb
         }
 
         // ショット
-        private void PLShot()
+        public void shot()
         {
             Vector3 nextPos = gameObject.transform.position;
             nextPos += _Speed * Time.deltaTime;
@@ -295,23 +282,23 @@ namespace ssb
                 if (nextPos.x < bottomLeft.x)
                 {
                     nextPos.x = bottomLeft.x + (bottomLeft.x - nextPos.x);
-                    _Speed.x *= (-1.0f);
+              //      _Speed.x *= (-1.0f);
                 }
                 else if (topRight.x < nextPos.x)
                 {
                     nextPos.x = topRight.x - (nextPos.x - topRight.x);
-                    _Speed.x *= (-1.0f);
+                //    _Speed.x *= (-1.0f);
                 }
 
                 if (nextPos.y < bottomLeft.y)
                 {
                     nextPos.y = bottomLeft.y + (bottomLeft.y - nextPos.y);
-                    _Speed.y *= (-1.0f);
+                  //  _Speed.y *= (-1.0f);
                 }
                 else if (topRight.y < nextPos.y)
                 {
                     nextPos.y = topRight.y - (nextPos.y - topRight.y);
-                    _Speed.y *= (-1.0f);
+                    //_Speed.y *= (-1.0f);
                 }
             }
 
@@ -322,7 +309,7 @@ namespace ssb
         private void death()
         {
             SEManager.Instance.playSE(SEManager.SEName.PLDeath);
-            _State = PLState.Death;
+          //  _State = PLState.Death;
             _BackGameObj.transform.localPosition = Vector3.zero;
             _BodyGameObj.SetActive(false);
             _BackGameObj.SetActive(false);
@@ -340,6 +327,7 @@ namespace ssb
 
         public void hit(bool isEnemy = false)
         {
+            /*
             // 敵に直接あたった場合
             if(isEnemy && _State == PLState.Attack)
             {
@@ -352,6 +340,7 @@ namespace ssb
             {
                 death();
             }
+            */
         }
 
         #endregion

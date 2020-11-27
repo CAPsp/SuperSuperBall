@@ -128,7 +128,7 @@ namespace ssb
             if (collision.gameObject.GetComponent<PLBehaviour>() != null)
             {
                 // PLから攻撃されたら吹っ飛ばされてHPが減る
-                if (collision.gameObject.GetComponent<PLBehaviour>()._State == PLBehaviour.PLState.Attack)
+               // if (collision.gameObject.GetComponent<PLBehaviour>()._State == PLBehaviour.PLState.Attack)
                 {
                     SEManager.Instance.playSE(SEManager.SEName.Hit);
                     _Speed = collision.gameObject.GetComponent<PLBehaviour>().getSpeed();

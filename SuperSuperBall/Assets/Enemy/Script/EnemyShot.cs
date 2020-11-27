@@ -41,7 +41,7 @@ namespace ssb
                 collision.gameObject.GetComponent<PLBehaviour>().hit();
 
                 // 攻撃中のPLに当たったら消える
-                if (collision.gameObject.GetComponent<PLBehaviour>()._State == PLBehaviour.PLState.Attack)
+               // if (collision.gameObject.GetComponent<PLBehaviour>()._State == PLBehaviour.PLState.Attack)
                 {
                     SEManager.Instance.playSE(SEManager.SEName.ShotDelete);
                     EnemyShotManager.Instance.shotDelete(gameObject);
