@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+
+using ssb.param;
 
 namespace ssb.state
 {
@@ -40,6 +40,7 @@ namespace ssb.state
     public class PLStateCharge : BaseState
     {
         private PLBehaviour _Owner;
+        private Vector3 _FixedPos;
 
         public PLStateCharge(PLBehaviour owner)
         {
@@ -48,26 +49,33 @@ namespace ssb.state
 
         public override void enter()
         {
-
+            _FixedPos = _Owner.transform.position;
         }
 
         public override void update()
         {
-            _Owner.move(InputManager.Instance.axisX, InputManager.Instance.axisY);
+            float distToFixedPos = Vector3.Distance(_FixedPos, _Owner.transform.position);
+            _Owner.move(
+                InputManager.Instance.axisX / (distToFixedPos + 1f),
+                InputManager.Instance.axisY / (distToFixedPos + 1f)
+            );
 
-            if (InputManager.Instance.Hold == InputManager.KeyState.Up)
+            _Owner.setFixedLocalPos(_FixedPos - _Owner.transform.position);
+
+            if (InputManager.Instance.Hold == InputManager.KeyState.Up) // ため解放
             {
+                _Owner.addSpeed((_FixedPos - _Owner.transform.position) * ParamManager.Instance.getParam<PLParam>()._ShotSpeedPerSec);
                 _Owner._StateMachine.changeState(new PLStateChargeRelease(_Owner));
             }
-            else if (InputManager.Instance.isDecide)
+            else if (InputManager.Instance.isDecide)    // ため解除
             {
+                _Owner.setFixedLocalPos(Vector3.zero);
                 _Owner._StateMachine.changeState(new PLStateNormal(_Owner));
             }
         }
 
         public override void exit()
         {
-
         }
     }
 
@@ -75,6 +83,7 @@ namespace ssb.state
     public class PLStateChargeRelease : BaseState
     {
         private PLBehaviour _Owner;
+        private Vector3 _FixedPos;
 
         public PLStateChargeRelease(PLBehaviour owner)
         {
@@ -83,29 +92,34 @@ namespace ssb.state
 
         public override void enter()
         {
-
+            _FixedPos = _Owner.transform.position;
         }
 
         public override void update()
         {
             _Owner.shot();
 
-            /*
-            if (Mathf.Sign(_Speed.x) != Mathf.Sign(diff.x) || Mathf.Sign(_Speed.y) != Mathf.Sign(diff.y))
+            _Owner.setFixedLocalPos(_FixedPos - _Owner.transform.position);
+
+            Vector3 diffToFixedPos = _FixedPos - _Owner.transform.position;
+
+            // ＰＬが固定した場所から通り抜けたら次のステートへ
+            bool isThroughFixedPos = Mathf.Sign(_Owner._Speed.x) != Mathf.Sign(diffToFixedPos.x) || Mathf.Sign(_Owner._Speed.y) != Mathf.Sign(diffToFixedPos.y);
+            if (isThroughFixedPos)
             {
                 _Owner._StateMachine.changeState(new PLStateShoot(_Owner));
             }
 
-            if (_Speed.magnitude < NOT_BIND_SPEED_LIMIT)
+            // ＰＬ速度が自由に動ける速度になったら通常ステートへ戻る
+            if (_Owner._Speed.magnitude < ParamManager.Instance.getParam<PLParam>()._FreeControllSpeedLimit)
             {
                 _Owner._StateMachine.changeState(new PLStateNormal(_Owner));
             }
-            */
         }
 
         public override void exit()
         {
-
+            _Owner.setFixedLocalPos(Vector3.zero);
         }
     }
 
@@ -128,18 +142,17 @@ namespace ssb.state
         {
             _Owner.shot();
 
-            /*
-            if (_Speed.magnitude < BIT_FREE_SPEED_LIMIT)
+            // 多少自由が利く速度になったらコントローラ入力を受け付ける
+            if (_Owner._Speed.magnitude < ParamManager.Instance.getParam<PLParam>()._BitControllSpeedLimit)
             {
-                _Speed += new Vector3(x, y, 0.0f) * 0.02f;
-                if (_Speed.magnitude < NOT_BIND_SPEED_LIMIT)
+                _Owner.addSpeed(new Vector3(InputManager.Instance.axisX, InputManager.Instance.axisY, 0.0f));
+
+                if (_Owner._Speed.magnitude < ParamManager.Instance.getParam<PLParam>()._FreeControllSpeedLimit)
                 {
-                    _Speed = Vector3.zero;
-                    _MutekiTimeSec = (_MutekiTimeSec <= 0f) ? MUTEKI_TIME_SEC : _MutekiTimeSec;
+                    _Owner._MutekiTimeSec = (_Owner._MutekiTimeSec <= 0f) ? ParamManager.Instance.getParam<PLParam>()._MutekiTimeSec : _Owner._MutekiTimeSec;
                     _Owner._StateMachine.changeState(new PLStateNormal(_Owner));
                 }
             }
-            */
         }
 
         public override void exit()
@@ -165,7 +178,12 @@ namespace ssb.state
 
         public override void update()
         {
-
+            // アニメーション処理が終わったらゲームオブジェクト破棄
+            //if (_Animator.GetCurrentAnimatorStateInfo(0).IsName("PL_death") &&
+            //    _Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+            //{
+            //    Destroy(_Owner.gameObject);
+            //}
         }
 
         public override void exit()

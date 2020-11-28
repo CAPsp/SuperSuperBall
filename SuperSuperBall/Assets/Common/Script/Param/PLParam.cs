@@ -12,6 +12,9 @@ namespace ssb.param
         // 通常速度
         public float _MoveSpeedPerSec;
 
+        // 発射速度
+        public float _ShotSpeedPerSec;
+
         // 操作がきくようになる速度
         public float _BitControllSpeedLimit;
 

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _SpeedResistance: 1
   _MoveSpeedPerSec: 4
+  _ShotSpeedPerSec: 10
   _BitControllSpeedLimit: 50
   _FreeControllSpeedLimit: 10
   _MutekiTimeSec: 2

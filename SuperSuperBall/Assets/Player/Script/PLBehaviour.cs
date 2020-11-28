@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+using ssb.param;
 using ssb.state;
 
 namespace ssb
@@ -10,6 +9,7 @@ namespace ssb
     // PLの操作
     public class PLBehaviour : CharaBaseBehaviour
     {
+        /*
         #region 定数
 
         private static readonly float SPEED_RESISTANCE = 1.0f;
@@ -25,13 +25,14 @@ namespace ssb
         private static readonly float MUTEKI_TIME_SEC = 2.0f;
 
         #endregion // 定数
+        */
 
         #region プロパティ
 
         public override ObjType _Type { protected set; get; } = ObjType.Player;
 
         // 無敵中の時間(setは無敵時間が切れたときのみ行える)
-        public float _MutekiTimeSec { private set; get; }
+        public float _MutekiTimeSec { set; get; }
 
         #endregion // プロパティ
 
@@ -43,11 +44,9 @@ namespace ssb
 
         private Animator _Animator;
 
-        private Vector3 _FixedPos;  // 力をためるときのポジション
-
         private CircleCollider2D _CricleCollider;
         private EdgeCollider2D _EdgeCollider;
-
+        
         #endregion // メンバ変数
 
         #region 基本
@@ -77,95 +76,8 @@ namespace ssb
             float y = InputManager.Instance.axisY;
 
             _StateMachine.update();
-            /*
-            switch (_State)
-            {
-                case PLState.Normal:
-
-                    PLMove(x, y);
-
-                    if (InputManager.Instance.Hold == InputManager.KeyState.Down
-                        && _MutekiTimeSec <= 0.0f)
-                    {
-                        _FixedPos = gameObject.transform.position;
-                        _State = PLState.Hold;
-                    }
-                    break;
-
-                case PLState.Hold:
-
-                    float dist = Vector3.Distance(_FixedPos, gameObject.transform.position);
-                    dist += 1.0f;
-                    dist *= dist;
-
-                    PLMove(x / dist, y / dist);
-
-                    // 残した体の位置を調整
-                    _BackGameObj.transform.localPosition = _FixedPos - gameObject.transform.position;
-
-                    if (InputManager.Instance.Hold == InputManager.KeyState.Up)
-                    {
-                        _Speed = (_FixedPos - gameObject.transform.position) * MOVE_SPEED * MOVE_SPEED;
-                        _State = PLState.Shoot;
-                    }
-                    else if(InputManager.Instance.isDecide)
-                    {
-                        _BackGameObj.transform.localPosition = Vector3.zero;
-                        _State = PLState.Normal;
-                    }
-                    break;
-
-                case PLState.Shoot:
-
-                    PLShot();
-
-                    _BackGameObj.transform.localPosition = _FixedPos - gameObject.transform.position;
-
-                    // 基点を追い越したら残した体がくっついてくるようになる
-                    Vector3 diff = _FixedPos - gameObject.transform.position;
-                    if (Mathf.Sign(_Speed.x) != Mathf.Sign(diff.x) || Mathf.Sign(_Speed.y) != Mathf.Sign(diff.y))
-                    {
-                        _BackGameObj.transform.localPosition = Vector3.zero;
-                        _State = PLState.Attack;
-                    }
-
-                    if(_Speed.magnitude < NOT_BIND_SPEED_LIMIT)
-                    {
-                        _BackGameObj.transform.localPosition = Vector3.zero;
-                        _State = PLState.Normal;
-                    }
-                    break;
-
-                case PLState.Attack:
-
-                    PLShot();
-
-                    if (_Speed.magnitude < BIT_FREE_SPEED_LIMIT)
-                    {
-                        _Speed += new Vector3(x, y, 0.0f) * 0.02f;
-                        if (_Speed.magnitude < NOT_BIND_SPEED_LIMIT)
-                        {
-                            _Speed = Vector3.zero;
-                            _MutekiTimeSec = (_MutekiTimeSec <= 0f) ? MUTEKI_TIME_SEC : _MutekiTimeSec;
-                            _State = PLState.Normal;
-                        }
-                    }
-                    break;
-
-                case PLState.Death:
-                    // アニメーション処理が終わったらゲームオブジェクト破棄
-                    if (_Animator.GetCurrentAnimatorStateInfo(0).IsName("PL_death") &&
-                        _Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
-                    {
-                        Destroy(gameObject);
-                    }
-
-                    break;
-            }
-            */
 
             float distFaceToBody = Vector3.Distance(_BackGameObj.transform.position, gameObject.transform.position);
-
             // 体が伸びていたら。コライダを切り替えて体を描画する
             if(distFaceToBody < _EdgeCollider.edgeRadius)
             {
@@ -193,8 +105,11 @@ namespace ssb
             }
 
             // 速度の減算
-            //_Speed.x -= (SPEED_RESISTANCE * Time.deltaTime * _Speed.x);
-            //_Speed.y -= (SPEED_RESISTANCE * Time.deltaTime * _Speed.y);
+            _Speed -= new Vector3(
+                _Speed.x * Time.deltaTime * ParamManager.Instance.getParam<PLParam>()._SpeedResistance,
+                _Speed.y * Time.deltaTime * ParamManager.Instance.getParam<PLParam>()._SpeedResistance,
+                0f
+            );
             if (_Speed.sqrMagnitude < 0.1f)
             {
                 _Speed = Vector3.zero;
@@ -320,11 +235,6 @@ namespace ssb
 
         #region 公開メソッド
 
-        public Vector3 getSpeed()
-        {
-            return _Speed;
-        }
-
         public void hit(bool isEnemy = false)
         {
             /*
@@ -343,6 +253,18 @@ namespace ssb
             */
         }
 
+        // 固定するローカル座標を設定
+        public void setFixedLocalPos(Vector3 localPos)
+        {
+            _BackGameObj.transform.localPosition = localPos;
+        }
+
+        // スピードを加算する
+        public void addSpeed(Vector3 speed)
+        {
+            _Speed = speed;
+        }
+        
         #endregion
     }
 

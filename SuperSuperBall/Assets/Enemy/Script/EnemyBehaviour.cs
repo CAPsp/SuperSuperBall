@@ -131,7 +131,7 @@ namespace ssb
                // if (collision.gameObject.GetComponent<PLBehaviour>()._State == PLBehaviour.PLState.Attack)
                 {
                     SEManager.Instance.playSE(SEManager.SEName.Hit);
-                    _Speed = collision.gameObject.GetComponent<PLBehaviour>().getSpeed();
+                    _Speed = collision.gameObject.GetComponent<PLBehaviour>()._Speed;
                     damage(1);
                 }
 
