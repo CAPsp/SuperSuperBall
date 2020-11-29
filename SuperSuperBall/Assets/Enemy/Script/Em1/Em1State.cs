@@ -120,7 +120,6 @@ namespace ssb.state
                 _Owner.resetSpeed();
                 _Owner._StateMachine.changeState(new Em1StateNormal(_Owner));
             }
-
         }
 
         public override void exit()

@@ -27,6 +27,9 @@ namespace ssb.param
         // 無視する速度量
         public float _IgnoreSpeedLimit          = 0f;
 
+        // 衝撃波のScale計算に考慮される除算値
+        public float _ExplosionDiv              = 0f;
+
         // 無敵時間さん！？
         public float _MutekiTimeSec             = 0f;
     }

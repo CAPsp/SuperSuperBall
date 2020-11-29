@@ -12,6 +12,7 @@ namespace ssb
         public enum ParticleName
         {
             Hit,
+            Explosion,
         }
 
         #endregion // enum
@@ -23,6 +24,8 @@ namespace ssb
 
         [SerializeField]
         private GameObject _Hit = null;
+        [SerializeField]
+        private GameObject _Explosion = null;
 
         private List<GameObject> _InstantObjList = new List<GameObject>();
 
@@ -32,7 +35,7 @@ namespace ssb
 
         private void Update()
         {
-            for(int i = 0; i < _InstantObjList.Count; i++)
+            for(int i = _InstantObjList.Count - 1; i >= 0; i--)
             {
                 GameObject obj = _InstantObjList[i];
                 if (obj.GetComponent<ParticleSystem>() != null)
@@ -51,12 +54,13 @@ namespace ssb
         #region 公開メソッド
 
         // 引数で渡された座標にパーティクルを生成
-        public void initiateParticle(ParticleName name, Vector3 pos)
+        public GameObject initiateParticle(ParticleName name, Vector3 pos)
         {
             GameObject obj = null;
             switch (name)
             {
-                case ParticleName.Hit: obj = Instantiate(_Hit);  break;
+                case ParticleName.Hit:          obj = Instantiate(_Hit);        break;
+                case ParticleName.Explosion:    obj = Instantiate(_Explosion);  break;
             }
 
             if(obj != null)
@@ -66,6 +70,8 @@ namespace ssb
 
                 _InstantObjList.Add(obj);
             }
+
+            return obj;
         }
 
         #endregion  // 公開メソッド

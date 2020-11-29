@@ -11,7 +11,7 @@ namespace ssb
 
         #region プロパティ
 
-        public override ObjType _Type { protected set; get; } = ObjType.Enemy;
+        public override ObjType _Type { protected set; get; } = ObjType.Shot;
 
         #endregion // プロパティ
 

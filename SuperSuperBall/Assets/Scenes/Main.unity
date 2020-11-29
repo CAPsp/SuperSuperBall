@@ -290,7 +290,7 @@ PrefabInstance:
     - target: {fileID: 5376487346557356813, guid: 8160e276481835b4182e6728ad554e25,
         type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5376487346557356813, guid: 8160e276481835b4182e6728ad554e25,
         type: 3}
@@ -422,6 +422,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _InstantField: {fileID: 1471522230}
   _Hit: {fileID: 1000011945391522, guid: 82a0ba6557c9bdb4ab0fb65c2a5c2493, type: 3}
+  _Explosion: {fileID: 1545806602296978, guid: 47deaee37409ee442a91ad2e7ff6c664, type: 3}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -608,7 +609,7 @@ PrefabInstance:
     - target: {fileID: 5376487346557356813, guid: 8160e276481835b4182e6728ad554e25,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5.23
+      value: -2.18
       objectReference: {fileID: 0}
     - target: {fileID: 5376487346557356813, guid: 8160e276481835b4182e6728ad554e25,
         type: 3}
@@ -1190,7 +1191,7 @@ PrefabInstance:
     - target: {fileID: 5376487346557356813, guid: 8160e276481835b4182e6728ad554e25,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.05
+      value: 1.08
       objectReference: {fileID: 0}
     - target: {fileID: 5376487346557356813, guid: 8160e276481835b4182e6728ad554e25,
         type: 3}
@@ -1291,8 +1292,8 @@ Transform:
   - {fileID: 263570672}
   - {fileID: 678484490}
   - {fileID: 1635307421}
-  - {fileID: 1792715847}
   - {fileID: 246523351}
+  - {fileID: 1792715847}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1415,7 +1416,7 @@ PrefabInstance:
     - target: {fileID: 5376487346557356813, guid: 8160e276481835b4182e6728ad554e25,
         type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5376487346557356813, guid: 8160e276481835b4182e6728ad554e25,
         type: 3}
@@ -1544,12 +1545,12 @@ PrefabInstance:
     - target: {fileID: 5376487346557356813, guid: 8160e276481835b4182e6728ad554e25,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.04
+      value: -0.57
       objectReference: {fileID: 0}
     - target: {fileID: 5376487346557356813, guid: 8160e276481835b4182e6728ad554e25,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.8
+      value: 2.18
       objectReference: {fileID: 0}
     - target: {fileID: 5376487346557356813, guid: 8160e276481835b4182e6728ad554e25,
         type: 3}

@@ -20,5 +20,11 @@ namespace ssb.param
 
         // HP
         public int _Hp                      = 0;
+
+        // 衝撃波によって受ける速度量
+        public float _SpeedByExplosion      = 0f;
+
+        // 同じオブジェクトに当たるようになるまでの時間　
+        public float _TimeSecOfReHitSameObj = 0f;
     }
 }

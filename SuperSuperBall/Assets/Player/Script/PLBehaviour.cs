@@ -223,9 +223,14 @@ namespace ssb
 
         public void hit(bool isEnemy = false)
         {
-            // 敵に直接あたった場合
+            // 敵にショットして直接あたった場合
             if(isEnemy && _StateMachine._CurrentState is PLStateShoot)
             {
+                // 衝撃波生成
+                GameObject explosion = ParticleManager.Instance.initiateParticle(ParticleManager.ParticleName.Explosion, gameObject.transform.position);
+                float scale = _Speed.magnitude / ParamManager.Instance.getParam<PLParam>()._ExplosionDiv;
+                explosion.transform.localScale = new Vector3(scale, scale, scale);
+
                 _Speed = Vector3.zero;
                 _MutekiTimeSec = (_MutekiTimeSec <= 0f) ? ParamManager.Instance.getParam<PLParam>()._MutekiTimeSec : _MutekiTimeSec;
             }

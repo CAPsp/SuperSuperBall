@@ -17,3 +17,5 @@ MonoBehaviour:
   _NotControllSpeedLimit: 10
   _MutekiTimeSec: 0.05
   _Hp: 5
+  _SpeedByExplosion: 20
+  _TimeSecOfReHitSameObj: 0.5
