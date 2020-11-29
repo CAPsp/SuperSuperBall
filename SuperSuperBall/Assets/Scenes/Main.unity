@@ -376,6 +376,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _ParamList:
   - {fileID: 11400000, guid: b4cf8833055c68c458a9028b3a639b09, type: 2}
+  - {fileID: 11400000, guid: 693d8036b4e1de94daf3abb4aab38865, type: 2}
 --- !u!1001 &432646792
 PrefabInstance:
   m_ObjectHideFlags: 0

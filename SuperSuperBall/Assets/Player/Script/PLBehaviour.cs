@@ -137,7 +137,6 @@ namespace ssb
             Vector3 nextPos = gameObject.transform.position;
             nextPos += new Vector3(x, y, 0f) * 0.05f;
 
-
             // 画面外に出ないよう調整
             if (!(CameraManager.Instance.checkInsideScreen(nextPos)))
             {
@@ -170,9 +169,9 @@ namespace ssb
         public void shot()
         {
             Vector3 nextPos = gameObject.transform.position;
-            nextPos += _Speed * Time.deltaTime;
-
             Vector3 nextSpeed = _Speed;
+
+            nextPos += _Speed * Time.deltaTime;
 
             // 画面外に出た場合は跳ね返る
             if (!(CameraManager.Instance.checkInsideScreen(nextPos)))
@@ -203,8 +202,8 @@ namespace ssb
                 }
             }
 
-            _Speed = nextSpeed;
             gameObject.transform.position = nextPos;
+            _Speed = nextSpeed;
         }
 
         // 死亡時の処理

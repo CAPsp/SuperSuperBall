@@ -32,6 +32,16 @@ namespace ssb
 
         #endregion // プロパティ
 
+        #region 公開メソッド
+
+        // 速度を０にリセットする
+        public void resetSpeed()
+        {
+            _Speed = Vector3.zero;
+        }
+
+        #endregion
+
     }
 
 }
