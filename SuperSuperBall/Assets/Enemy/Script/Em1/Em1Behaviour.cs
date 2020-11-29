@@ -35,6 +35,7 @@ namespace ssb
             _Hp             = ParamManager.Instance.getParam<Em1Param>()._Hp;
             _Speed          = Vector3.zero;
             _StateMachine   = new StateMachine(new Em1StateNormal(this), this);
+            _BasePos        = transform.position;
         }
 
         // Update is called once per frame
@@ -209,7 +210,6 @@ namespace ssb
                 _StateMachine.changeState(new Em1StateDamage(this));
             }
         }
-
         #endregion
 
     }

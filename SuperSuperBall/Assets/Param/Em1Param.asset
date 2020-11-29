@@ -19,3 +19,4 @@ MonoBehaviour:
   _Hp: 5
   _SpeedByExplosion: 20
   _TimeSecOfReHitSameObj: 0.5
+  _MoveSpeedSec: 1

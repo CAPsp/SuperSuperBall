@@ -26,5 +26,8 @@ namespace ssb.param
 
         // 同じオブジェクトに当たるようになるまでの時間　
         public float _TimeSecOfReHitSameObj = 0f;
+
+        // 移動速度
+        public float _MoveSpeedSec          = 0f;
     }
 }
