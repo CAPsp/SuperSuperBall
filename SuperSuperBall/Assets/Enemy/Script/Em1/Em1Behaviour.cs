@@ -8,11 +8,7 @@ namespace ssb
     // 敵１
     public class Em1Behaviour : EnemyBehaviour
     {
-        #region プロパティ
-
-        public override ObjType _Type { protected set; get; } = ObjType.Enemy;
-
-        #endregion // プロパティ
+        public bool isHited = true;
 
         #region 基本
 
@@ -31,6 +27,28 @@ namespace ssb
             moveUpdate();
         }
 
+        // GUIとして描画する部分(Debug)
+        //private void OnGUI()
+        //{
+
+        //    Vector2 pos = new Vector2(
+        //        transform.position.x - CameraManager.Instance.BottomLeft.x,
+        //        (-1) * transform.position.y - CameraManager.Instance.BottomLeft.y
+        //    );
+
+        //    GUI.Label(new Rect(
+        //        pos.x * 40,
+        //        pos.y * 40,
+        //        30,
+        //        30), _Hp.ToString(), GUI.skin.box);
+
+        //    GUI.Label(new Rect(
+        //        pos.x * 40,
+        //        pos.y * 40 + 30,
+        //        150,
+        //        30), _StateMachine._CurrentState.ToString(), GUI.skin.box);
+        //}
+
         #endregion // 基本
 
         #region 衝突
@@ -46,21 +64,27 @@ namespace ssb
                     SEManager.Instance.playSE(SEManager.SEName.Hit);
                     _Speed = collision.gameObject.GetComponent<PLBehaviour>()._Speed;
                     damage(1);
+                    ParticleManager.Instance.initiateParticle(ParticleManager.ParticleName.Hit, collision.contacts[0].point);
                 }
 
                 collision.gameObject.GetComponent<PLBehaviour>().hit(true);
             }
             // 他の敵に当たった場合
-            else if (collision.gameObject.GetComponent<EnemyBehaviour>() != null &&
-                    (_Speed.sqrMagnitude > collision.gameObject.GetComponent<EnemyBehaviour>()._Speed.sqrMagnitude))
+            else if (   _StateMachine._CurrentState is Em1StateBlowOut &&
+                        collision.gameObject.GetComponent<EnemyBehaviour>() != null)
             {
                 SEManager.Instance.playSE(SEManager.SEName.Hit);
                 damage(1);
+                ParticleManager.Instance.initiateParticle(ParticleManager.ParticleName.Hit, collision.contacts[0].point);
 
                 Vector3 currentSpeed = _Speed;
-                _Speed = collision.gameObject.GetComponent<EnemyBehaviour>()._Speed;
+                _Speed = collision.gameObject.GetComponent<Em1Behaviour>()._Speed;
+
+                // 当たった敵にも影響を与える
                 collision.gameObject.GetComponent<Em1Behaviour>()._Speed = currentSpeed;
+                collision.gameObject.GetComponent<Em1Behaviour>().damage(1);
             }
+
         }
 
         #endregion // 衝突
@@ -113,7 +137,7 @@ namespace ssb
         }
 
         // ダメージを受けた際の処理
-        private void damage(int damage)
+        public void damage(int damage)
         {
             _Hp -= damage;
             if (_Hp <= 0)

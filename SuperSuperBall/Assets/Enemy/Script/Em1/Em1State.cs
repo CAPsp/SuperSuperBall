@@ -58,17 +58,25 @@ namespace ssb.state
         private float _TimerSec;
         private Collider2D _Collider2D;
 
+        private Color _SpriteDefaultColor;
+        private SpriteRenderer _SpriteRenderer;
+
         public Em1StateDamage(EnemyBehaviour owner)
         {
             _Owner = owner;
 
-            _Collider2D = _Owner.GetComponent<Collider2D>();
+            _Collider2D     = _Owner.GetComponent<Collider2D>();
+            _SpriteRenderer = _Owner.GetComponent<SpriteRenderer>();
         }
 
         public override void enter()
         {
-            _TimerSec           = ParamManager.Instance.getParam<Em1Param>()._MutekiTimeSec;
-            _Collider2D.enabled = false;
+            _TimerSec               = ParamManager.Instance.getParam<Em1Param>()._MutekiTimeSec;
+            _Collider2D.enabled     = false;
+
+            // ダメージ受けている最中は色が変化
+            _SpriteDefaultColor     = _SpriteRenderer.color;
+            _SpriteRenderer.color   = Color.blue;
         }
 
         public override void update()
@@ -83,7 +91,8 @@ namespace ssb.state
 
         public override void exit()
         {
-            _Collider2D.enabled = true;
+            _Collider2D.enabled     = true;
+            _SpriteRenderer.color   = _SpriteDefaultColor;
         }
     }
 
