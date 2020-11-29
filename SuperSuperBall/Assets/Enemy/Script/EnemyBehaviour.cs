@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+
+using ssb.state;
 
 namespace ssb
 {
@@ -31,8 +31,6 @@ namespace ssb
 
         private int _Hp;
 
-        private Vector3 _Speed;
-
         private float _NotCollideTimeSec = 0.0f;
 
         #endregion // フィールド
@@ -62,6 +60,8 @@ namespace ssb
             Vector3 nextPos = gameObject.transform.position;
             nextPos += _Speed * Time.deltaTime;
 
+            Vector3 nextSpeed = _Speed;
+
             // 画面外に出た場合は跳ね返る
             if (!(CameraManager.Instance.checkInsideScreen(nextPos)))
             {
@@ -71,30 +71,32 @@ namespace ssb
                 if (nextPos.x < bottomLeft.x)
                 {
                     nextPos.x = bottomLeft.x + (bottomLeft.x - nextPos.x);
-                    _Speed.x *= (-1.0f);
+                    nextSpeed.x *= (-1.0f);
                 }
                 else if (topRight.x < nextPos.x)
                 {
                     nextPos.x = topRight.x - (nextPos.x - topRight.x);
-                    _Speed.x *= (-1.0f);
+                    nextSpeed.x *= (-1.0f);
                 }
 
                 if (nextPos.y < bottomLeft.y)
                 {
                     nextPos.y = bottomLeft.y + (bottomLeft.y - nextPos.y);
-                    _Speed.y *= (-1.0f);
+                    nextSpeed.y *= (-1.0f);
                 }
                 else if (topRight.y < nextPos.y)
                 {
                     nextPos.y = topRight.y - (nextPos.y - topRight.y);
-                    _Speed.y *= (-1.0f);
+                    nextSpeed.y *= (-1.0f);
                 }
             }
             gameObject.transform.position = nextPos;
 
             // 速度の減算
-            _Speed.x -= (SPEED_RESISTANCE * Time.deltaTime * _Speed.x);
-            _Speed.y -= (SPEED_RESISTANCE * Time.deltaTime * _Speed.y);
+            nextSpeed.x -= (SPEED_RESISTANCE * Time.deltaTime * _Speed.x);
+            nextSpeed.y -= (SPEED_RESISTANCE * Time.deltaTime * _Speed.y);
+
+            _Speed = nextSpeed;
 
             // 弾を生成する
             _ShotGenTimerSec += Time.deltaTime;
@@ -128,7 +130,7 @@ namespace ssb
             if (collision.gameObject.GetComponent<PLBehaviour>() != null)
             {
                 // PLから攻撃されたら吹っ飛ばされてHPが減る
-               // if (collision.gameObject.GetComponent<PLBehaviour>()._State == PLBehaviour.PLState.Attack)
+                if (collision.gameObject.GetComponent<PLBehaviour>()._StateMachine._CurrentState is PLStateShoot)
                 {
                     SEManager.Instance.playSE(SEManager.SEName.Hit);
                     _Speed = collision.gameObject.GetComponent<PLBehaviour>()._Speed;

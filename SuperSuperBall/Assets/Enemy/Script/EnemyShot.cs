@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+
+using ssb.state;
 
 namespace ssb
 {
@@ -14,12 +14,6 @@ namespace ssb
         public override ObjType _Type { protected set; get; } = ObjType.Enemy;
 
         #endregion // プロパティ
-
-        #region フィールド
-
-        private Vector3 _Speed;
-
-        #endregion
 
         #region 基本
 
@@ -41,7 +35,7 @@ namespace ssb
                 collision.gameObject.GetComponent<PLBehaviour>().hit();
 
                 // 攻撃中のPLに当たったら消える
-               // if (collision.gameObject.GetComponent<PLBehaviour>()._State == PLBehaviour.PLState.Attack)
+                if (collision.gameObject.GetComponent<PLBehaviour>()._StateMachine._CurrentState is PLStateShoot)
                 {
                     SEManager.Instance.playSE(SEManager.SEName.ShotDelete);
                     EnemyShotManager.Instance.shotDelete(gameObject);

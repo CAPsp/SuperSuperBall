@@ -9,24 +9,6 @@ namespace ssb
     // PLの操作
     public class PLBehaviour : CharaBaseBehaviour
     {
-        /*
-        #region 定数
-
-        private static readonly float SPEED_RESISTANCE = 1.0f;
-
-        private static readonly float MOVE_SPEED = 4.0f;
-
-        // 若干操作がきくようになる速度
-        private static readonly float BIT_FREE_SPEED_LIMIT = 50.0f;
-
-        // 自由がきくようになる速度
-        private static readonly float NOT_BIND_SPEED_LIMIT = 10.0f;
-
-        private static readonly float MUTEKI_TIME_SEC = 2.0f;
-
-        #endregion // 定数
-        */
-
         #region プロパティ
 
         public override ObjType _Type { protected set; get; } = ObjType.Player;
@@ -34,16 +16,17 @@ namespace ssb
         // 無敵中の時間(setは無敵時間が切れたときのみ行える)
         public float _MutekiTimeSec { set; get; }
 
+        // PL子要素に存在するPL背面描画用GameObject
+        public GameObject _BackGameObj { private set; get; }
+
         #endregion // プロパティ
 
         #region メンバ変数
 
-        // PLの子要素に存在する描画用GameObject
+        // PLの子要素に存在するPL体描画用GameObject
         private GameObject _BodyGameObj;
-        private GameObject _BackGameObj;
 
-        private Animator _Animator;
-
+        // 状態に合わせて使い分けるコライダ
         private CircleCollider2D _CricleCollider;
         private EdgeCollider2D _EdgeCollider;
         
@@ -58,8 +41,6 @@ namespace ssb
             _BodyGameObj = gameObject.transform.Find("Body").gameObject;
             _BackGameObj = gameObject.transform.Find("Back").gameObject;
 
-            _Animator = gameObject.GetComponent<Animator>();
-
             _CricleCollider = GetComponent<CircleCollider2D>();
             _EdgeCollider   = GetComponent<EdgeCollider2D>();
 
@@ -72,13 +53,14 @@ namespace ssb
         // Update is called once per frame
         private void Update()
         {
-            float x = InputManager.Instance.axisX;
-            float y = InputManager.Instance.axisY;
-
+            // ステート処理
             _StateMachine.update();
 
-            float distFaceToBody = Vector3.Distance(_BackGameObj.transform.position, gameObject.transform.position);
+            // ----------------------------------------------------------
+            // ステートに依存しない処理(常時必要な処理等)は以下に記述
+
             // 体が伸びていたら。コライダを切り替えて体を描画する
+            float distFaceToBody = Vector3.Distance(_BackGameObj.transform.position, gameObject.transform.position);
             if(distFaceToBody < _EdgeCollider.edgeRadius)
             {
                 _CricleCollider.enabled = true;
@@ -110,16 +92,17 @@ namespace ssb
                 _Speed.y * Time.deltaTime * ParamManager.Instance.getParam<PLParam>()._SpeedResistance,
                 0f
             );
-            if (_Speed.sqrMagnitude < 0.1f)
+            if (_Speed.sqrMagnitude < ParamManager.Instance.getParam<PLParam>()._IgnoreSpeedLimit)
             {
                 _Speed = Vector3.zero;
             }
 
+            // 無敵時間処理
             if(_MutekiTimeSec > 0.0f)
             {
                 _MutekiTimeSec -= Time.deltaTime;
                 
-                if(_MutekiTimeSec <= 0.0f)  // 無敵中消滅
+                if(_MutekiTimeSec <= 0.0f)  // 無敵消滅
                 {
                     foreach (var sprite in gameObject.GetComponentsInChildren<SpriteRenderer>())
                     {
@@ -137,10 +120,11 @@ namespace ssb
             }
         }
 
+        // GUIとして描画する部分(Debug)
         private void OnGUI()
         {
-            GUI.Label(new Rect(0, 0, 100, 50), _Speed.ToString(), GUI.skin.box);
-            GUI.Label(new Rect(0, 50, 100, 50), _StateMachine._CurrentState.ToString(), GUI.skin.box);
+            GUI.Label(new Rect(0, 0, 200, 50), _Speed.ToString(), GUI.skin.box);
+            GUI.Label(new Rect(0, 50, 200, 50), _StateMachine._CurrentState.ToString(), GUI.skin.box);
         }
 
         #endregion // 基本
@@ -188,6 +172,8 @@ namespace ssb
             Vector3 nextPos = gameObject.transform.position;
             nextPos += _Speed * Time.deltaTime;
 
+            Vector3 nextSpeed = _Speed;
+
             // 画面外に出た場合は跳ね返る
             if (!(CameraManager.Instance.checkInsideScreen(nextPos)))
             {
@@ -197,38 +183,39 @@ namespace ssb
                 if (nextPos.x < bottomLeft.x)
                 {
                     nextPos.x = bottomLeft.x + (bottomLeft.x - nextPos.x);
-              //      _Speed.x *= (-1.0f);
+                    nextSpeed.x *= (-1.0f);
                 }
                 else if (topRight.x < nextPos.x)
                 {
                     nextPos.x = topRight.x - (nextPos.x - topRight.x);
-                //    _Speed.x *= (-1.0f);
+                    nextSpeed.x *= (-1.0f);
                 }
 
                 if (nextPos.y < bottomLeft.y)
                 {
                     nextPos.y = bottomLeft.y + (bottomLeft.y - nextPos.y);
-                  //  _Speed.y *= (-1.0f);
+                    nextSpeed.y *= (-1.0f);
                 }
                 else if (topRight.y < nextPos.y)
                 {
                     nextPos.y = topRight.y - (nextPos.y - topRight.y);
-                    //_Speed.y *= (-1.0f);
+                    nextSpeed.y *= (-1.0f);
                 }
             }
 
+            _Speed = nextSpeed;
             gameObject.transform.position = nextPos;
         }
 
         // 死亡時の処理
         private void death()
         {
-            SEManager.Instance.playSE(SEManager.SEName.PLDeath);
-          //  _State = PLState.Death;
             _BackGameObj.transform.localPosition = Vector3.zero;
             _BodyGameObj.SetActive(false);
             _BackGameObj.SetActive(false);
-            _Animator.SetBool("isDeath", true);
+
+            // ステート変更
+            _StateMachine.changeState(new PLStateDeath(this));
         }
 
         #endregion // 非公開メソッド
@@ -237,20 +224,18 @@ namespace ssb
 
         public void hit(bool isEnemy = false)
         {
-            /*
             // 敵に直接あたった場合
-            if(isEnemy && _State == PLState.Attack)
+            if(isEnemy && _StateMachine._CurrentState is PLStateShoot)
             {
                 _Speed = Vector3.zero;
-                _MutekiTimeSec = (_MutekiTimeSec <= 0f) ? MUTEKI_TIME_SEC : _MutekiTimeSec;
+                _MutekiTimeSec = (_MutekiTimeSec <= 0f) ? ParamManager.Instance.getParam<PLParam>()._MutekiTimeSec : _MutekiTimeSec;
             }
 
-            if ((_State != PLState.Attack && _State != PLState.Death) &&
+            if (!(_StateMachine._CurrentState is PLStateShoot || _StateMachine._CurrentState is PLStateDeath) &&
                  _MutekiTimeSec <= 0.0f)
             {
                 death();
             }
-            */
         }
 
         // 固定するローカル座標を設定
@@ -262,7 +247,7 @@ namespace ssb
         // スピードを加算する
         public void addSpeed(Vector3 speed)
         {
-            _Speed = speed;
+            _Speed += speed;
         }
         
         #endregion

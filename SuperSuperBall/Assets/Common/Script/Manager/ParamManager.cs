@@ -7,13 +7,6 @@ namespace ssb
     // パラメータ管理
     public class ParamManager : SingletonMonoBehaviour<ParamManager>
     {
-        #region 定数
-
-        // パラメータを管理しているフォルダ
-        private static readonly string PARAM_FOLDER = "/Param/";
-
-        #endregion
-
         #region フィールド
 
         // 読み込んだパラメータ群

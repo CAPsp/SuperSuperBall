@@ -56,8 +56,8 @@ namespace ssb.state
         {
             float distToFixedPos = Vector3.Distance(_FixedPos, _Owner.transform.position);
             _Owner.move(
-                InputManager.Instance.axisX / (distToFixedPos + 1f),
-                InputManager.Instance.axisY / (distToFixedPos + 1f)
+                InputManager.Instance.axisX / ((distToFixedPos + 1f) * ParamManager.Instance.getParam<PLParam>()._ChargeResistance),
+                InputManager.Instance.axisY / ((distToFixedPos + 1f) * ParamManager.Instance.getParam<PLParam>()._ChargeResistance)
             );
 
             _Owner.setFixedLocalPos(_FixedPos - _Owner.transform.position);
@@ -92,7 +92,7 @@ namespace ssb.state
 
         public override void enter()
         {
-            _FixedPos = _Owner.transform.position;
+            _FixedPos = _Owner._BackGameObj.transform.position;
         }
 
         public override void update()
@@ -145,7 +145,7 @@ namespace ssb.state
             // 多少自由が利く速度になったらコントローラ入力を受け付ける
             if (_Owner._Speed.magnitude < ParamManager.Instance.getParam<PLParam>()._BitControllSpeedLimit)
             {
-                _Owner.addSpeed(new Vector3(InputManager.Instance.axisX, InputManager.Instance.axisY, 0.0f));
+                _Owner.addSpeed(new Vector3(InputManager.Instance.axisX * Time.deltaTime, InputManager.Instance.axisY * Time.deltaTime, 0.0f));
 
                 if (_Owner._Speed.magnitude < ParamManager.Instance.getParam<PLParam>()._FreeControllSpeedLimit)
                 {
@@ -165,25 +165,29 @@ namespace ssb.state
     public class PLStateDeath : BaseState
     {
         private PLBehaviour _Owner;
+        private Animator _Anim;
 
         public PLStateDeath(PLBehaviour owner)
         {
             _Owner = owner;
+            _Anim = _Owner.GetComponent<Animator>();
         }
 
         public override void enter()
         {
-
+            // SE発生とアニメーション開始
+            SEManager.Instance.playSE(SEManager.SEName.PLDeath);
+            _Anim.SetBool("isDeath", true);
         }
 
         public override void update()
         {
             // アニメーション処理が終わったらゲームオブジェクト破棄
-            //if (_Animator.GetCurrentAnimatorStateInfo(0).IsName("PL_death") &&
-            //    _Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
-            //{
-            //    Destroy(_Owner.gameObject);
-            //}
+            if (_Anim.GetCurrentAnimatorStateInfo(0).IsName("PL_death") &&
+                _Anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+            {
+                UnityEngine.Object.Destroy(_Owner.gameObject);
+            }
         }
 
         public override void exit()
