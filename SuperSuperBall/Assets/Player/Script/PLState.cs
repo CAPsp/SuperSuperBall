@@ -54,11 +54,22 @@ namespace ssb.state
 
         public override void update()
         {
+            Vector3 expectedPos = _Owner.transform.position + new Vector3(InputManager.Instance.axisX, InputManager.Instance.axisY, 0f);
+
+            // 速度量が増加するような移動の時のみ抵抗力が働く
             float distToFixedPos = Vector3.Distance(_FixedPos, _Owner.transform.position);
-            _Owner.move(
-                InputManager.Instance.axisX / ((distToFixedPos + 1f) * ParamManager.Instance.getParam<PLParam>()._ChargeResistance),
-                InputManager.Instance.axisY / ((distToFixedPos + 1f) * ParamManager.Instance.getParam<PLParam>()._ChargeResistance)
-            );
+            if (distToFixedPos < Vector3.Distance(_FixedPos, expectedPos) &&
+                distToFixedPos >= 0.5f)
+            {
+                _Owner.move(
+                    InputManager.Instance.axisX / (distToFixedPos * ParamManager.Instance.getParam<PLParam>()._ChargeResistance),
+                    InputManager.Instance.axisY / (distToFixedPos * ParamManager.Instance.getParam<PLParam>()._ChargeResistance)
+                );
+            }
+            else
+            {
+                _Owner.move(InputManager.Instance.axisX, InputManager.Instance.axisY);
+            }
 
             _Owner.setFixedLocalPos(_FixedPos - _Owner.transform.position);
 

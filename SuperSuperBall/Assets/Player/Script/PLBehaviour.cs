@@ -121,11 +121,11 @@ namespace ssb
         }
 
         // GUIとして描画する部分(Debug)
-        private void OnGUI()
-        {
-            GUI.Label(new Rect(0, 0, 200, 50), _Speed.ToString(), GUI.skin.box);
-            GUI.Label(new Rect(0, 50, 200, 50), _StateMachine._CurrentState.ToString(), GUI.skin.box);
-        }
+        //private void OnGUI()
+        //{
+        //    GUI.Label(new Rect(0, 0, 200, 50), _Speed.ToString(), GUI.skin.box);
+        //    GUI.Label(new Rect(0, 50, 200, 50), _StateMachine._CurrentState.ToString(), GUI.skin.box);
+        //}
 
         #endregion // 基本
 
@@ -230,6 +230,9 @@ namespace ssb
                 GameObject explosion = ParticleManager.Instance.initiateParticle(ParticleManager.ParticleName.Explosion, gameObject.transform.position);
                 float scale = _Speed.magnitude / ParamManager.Instance.getParam<PLParam>()._ExplosionDiv;
                 explosion.transform.localScale = new Vector3(scale, scale, scale);
+
+                // 火っとストップ
+                RistrictManager.Instance.stop(0.002f * _Speed.magnitude);
 
                 _Speed = Vector3.zero;
                 _MutekiTimeSec = (_MutekiTimeSec <= 0f) ? ParamManager.Instance.getParam<PLParam>()._MutekiTimeSec : _MutekiTimeSec;

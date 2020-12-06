@@ -37,7 +37,7 @@ namespace ssb.state
                         (
                             new Vector2(_Owner.transform.position.x, _Owner.transform.position.y),
                             new Vector2(angle.x, angle.y),
-                            3.0f
+                            1.5f
                         );
 
                     _ShotGenTimerSec = 0.0f;

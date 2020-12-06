@@ -32,6 +32,16 @@ namespace ssb
 
         #endregion // プロパティ
 
+        #region 基本
+
+        private void Start()
+        {
+            // 一時停止管理マネージャーに登録
+            RistrictManager.Instance.registerBehaviour(this);
+        }
+
+        #endregion // 基本
+
         #region 公開メソッド
 
         // 速度を０にリセットする

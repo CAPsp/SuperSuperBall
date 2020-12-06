@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PLParam
   m_EditorClassIdentifier: 
   _SpeedResistance: 1
-  _ChargeResistance: 5
+  _ChargeResistance: 8
   _MoveSpeedPerSec: 4
   _ShotSpeedPerSec: 20
   _BitControllSpeedLimit: 50
