@@ -20,7 +20,7 @@ namespace ssb
         private void Update()
         {
             // 停止タイマーが作動している場合、タイマー切れで停止を解除する
-            if(_StopTimerSec > 0f)
+            if(_StopTimerSec >= 0f)
             {
                 _StopTimerSec -= Time.unscaledDeltaTime;
                 if(_StopTimerSec <= 0f)

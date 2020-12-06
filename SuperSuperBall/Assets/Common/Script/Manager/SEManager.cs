@@ -45,13 +45,22 @@ namespace ssb
         // 引数に渡されたＳＥを鳴らす
         public void playSE(SEName name)
         {
+            AudioClip tmpClip = null;
             switch(name)
             {
-                case SEName.Hit:        _AudioSource.clip = _Hit;       break;
-                case SEName.PLDeath:    _AudioSource.clip = _PLDeath;   break;
-                case SEName.ShotDelete: _AudioSource.clip = _ShotDelete; break;
+                case SEName.Hit:        tmpClip = _Hit;        break;
+                case SEName.PLDeath:    tmpClip = _PLDeath;    break;
+                case SEName.ShotDelete: tmpClip = _ShotDelete; break;
             }
-            
+
+            // SE重複再生、nullの阻止
+            if (tmpClip == null ||
+                (_AudioSource.clip == tmpClip && _AudioSource.isPlaying))
+            {
+                return;
+            }
+
+            _AudioSource.clip = tmpClip;
             _AudioSource.Play();
         }
 
