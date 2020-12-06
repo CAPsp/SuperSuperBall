@@ -55,13 +55,30 @@ namespace ssb
             _GameTimeSec    = 0f;
             _SpawnCnt       = 0;
 
+            // -----------------------------
             // DEBUG
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(0f, 1f), 1f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(1f, 1f),   1f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-1f, 1f),    1f));
 
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-2f, 1.5f),   5f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(2f, 1.5f),    5f));
+            // Wave1
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(0f,  1f), 1f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(1f,  1f), 1f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-1f, 1f), 1f));
+
+            // Wave2
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-1f, 1.5f), 4f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-2f, 1.5f), 4f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-3f, 1.5f), 4f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-4f, 1.5f), 4f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(1f,  1.5f), 6f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(2f,  1.5f), 6f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(3f,  1.5f), 6f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(4f,  1.5f), 6f));
+
+            // Wave3
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(0f, 1.5f), 12f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(1f, 1.5f), 12f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(2f, 1.5f), 12f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-1f, 1.5f), 12f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-2f, 1.5f), 12f));
         }
 
         private void Update()

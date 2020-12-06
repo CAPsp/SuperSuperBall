@@ -31,7 +31,7 @@ namespace ssb.state
                 if (GameObject.FindGameObjectWithTag("Player") != null)
                 {
                     Vector3 plPos = GameObject.FindGameObjectWithTag("Player").transform.position;
-                    Vector3 angle = ((plPos + Unity2DUtil.genRandomVector2(3.0f)) - _Owner.transform.position).normalized;
+                    Vector3 angle = ((plPos + Unity2DUtil.genRandomVector2(1.0f)) - _Owner.transform.position).normalized;
 
                     EnemyShotManager.Instance.shotGen
                         (
@@ -117,13 +117,25 @@ namespace ssb.state
 
         public override void enter()
         {
+            // HP0以下で死亡することが決まっている場合、色を変化させる
+            if (_Owner._Hp <= 0)
+            {
+                _Owner.GetComponent<SpriteRenderer>().color = Color.black;
+            }
         }
 
         public override void update()
         {
-            // 速度が一定未満になった場合通常ステートに戻る
+            // 速度が一定未満になった場合
             if (_Owner._Speed.magnitude < ParamManager.Instance.getParam<Em1Param>()._NotControllSpeedLimit)
             {
+                // HPが0以下で死亡する
+                if (_Owner._Hp <= 0)
+                {
+                    EnemySpawnManager.Instance._SpawnCnt--;
+                    GameObject.Destroy(_Owner.gameObject);
+                }
+
                 _Owner.resetSpeed();
                 _Owner._StateMachine.changeState(new Em1StateNormal(_Owner));
             }

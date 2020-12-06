@@ -200,15 +200,7 @@ namespace ssb
         public void damage(int damage)
         {
             _Hp -= damage;
-            if (_Hp <= 0)
-            {
-                EnemySpawnManager.Instance._SpawnCnt--;
-                Destroy(this.gameObject);
-            }
-            else
-            {
-                _StateMachine.changeState(new Em1StateDamage(this));
-            }
+            _StateMachine.changeState(new Em1StateDamage(this));
         }
         #endregion
 

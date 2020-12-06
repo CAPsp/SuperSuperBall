@@ -20,4 +20,5 @@ MonoBehaviour:
   _FreeControllSpeedLimit: 10
   _IgnoreSpeedLimit: 0.1
   _ExplosionDiv: 15
-  _MutekiTimeSec: 2
+  _MutekiTimeSec: 1
+  _Life: 3
