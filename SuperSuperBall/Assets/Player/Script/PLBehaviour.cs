@@ -135,7 +135,7 @@ namespace ssb
         public void move(float x, float y)
         {
             Vector3 nextPos = gameObject.transform.position;
-            nextPos += new Vector3(x, y, 0f) * 0.05f;
+            nextPos += new Vector3(x, y, 0f) * ParamManager.Instance.getParam<PLParam>()._MoveSpeedPerSec * Time.deltaTime;
 
             // 画面外に出ないよう調整
             if (!(CameraManager.Instance.checkInsideScreen(nextPos)))
