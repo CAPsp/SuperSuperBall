@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using ssb.param;
+
 namespace ssb
 {
     // プレイヤー管理
@@ -14,7 +16,7 @@ namespace ssb
         public GameObject _CurrentPLObj { private set; get; } = null;
 
         // 残り残機数
-        public int _CurrentLife { private set; get; } = 3;
+        public int _CurrentLife { private set; get; } = 0;
 
         #endregion // プロパティ
 
@@ -29,6 +31,12 @@ namespace ssb
         #endregion  // フィールド
 
         #region 基本
+
+        private void Start()
+        {
+            // 初手で残機を１減らしてＰＬを生成する
+            _CurrentLife = ParamManager.Instance.getParam<PLParam>()._Life + 1;
+        }
 
         private void LateUpdate()
         {

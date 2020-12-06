@@ -8,23 +8,15 @@ namespace ssb
     public class GameManager : SingletonMonoBehaviour<GameManager>
     {
 
-        #region フィールド
+        #region 基本
 
-        [SerializeField]
-        private GameObject _PLPrefab;
-
-        [SerializeField]
-        private GameObject _PLInstObj;
-
-        #endregion  // フィールド
-
-        #region 公開メソッド
-
-        void spawn()
+        private void Start()
         {
-
+            // BGM再生
+            BGMManager.Instance.playBGM(BGMManager.BGMName.Main);
         }
 
-        #endregion  // 公開メソッド
+        #endregion // 基本
+
     }
 }

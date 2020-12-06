@@ -36,8 +36,8 @@ namespace ssb
 
         #region 公開メソッド
 
-        // 引数に渡されたＳＥを鳴らす
-        public void playSE(BGMName name)
+        // 引数に渡されたBGMを鳴らす
+        public void playBGM(BGMName name)
         {
             _AudioSource.clip = testClip;
             _AudioSource.Play();

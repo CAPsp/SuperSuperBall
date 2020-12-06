@@ -32,5 +32,8 @@ namespace ssb.param
 
         // 無敵時間さん！？
         public float _MutekiTimeSec             = 0f;
+
+        // 残機数
+        public int _Life                        = 0;
     }
 }

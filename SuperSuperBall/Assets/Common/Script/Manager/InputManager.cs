@@ -19,11 +19,13 @@ namespace ssb
 
         #endregion // enum
 
-
         #region 公開プロパティ
 
         // 決定
         public bool isDecide { get; private set; }
+
+        // キャンセル
+        public bool isCancel { get; private set; }
 
         // 移動値
         public float axisX { get; private set; }
@@ -42,6 +44,10 @@ namespace ssb
             isDecide =
                 Input.GetKeyDown(KeyCode.Space) ||
                 Input.GetButtonDown("Submit");
+
+            isCancel =
+                Input.GetKeyDown(KeyCode.Backspace) ||
+                Input.GetButtonDown("Cancel");
 
             axisX = Input.GetAxis("Horizontal");
             axisY = Input.GetAxis("Vertical");
