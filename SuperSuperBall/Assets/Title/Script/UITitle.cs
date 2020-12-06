@@ -1,12 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 using UnityEngine.UI;
 
 public class UITitle : MonoBehaviour
 {
-
     #region 定数
 
     public float FLASH_INTERVAL_SEC = 2f;
