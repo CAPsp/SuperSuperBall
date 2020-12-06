@@ -47,7 +47,7 @@ namespace ssb
             // 初期化
             _Speed         = Vector3.zero;
             _StateMachine  = new StateMachine(new PLStateNormal(this), this);
-            _MutekiTimeSec = 0f;
+            _MutekiTimeSec = ParamManager.Instance.getParam<PLParam>()._MutekiTimeSec;
         }
 
         // Update is called once per frame

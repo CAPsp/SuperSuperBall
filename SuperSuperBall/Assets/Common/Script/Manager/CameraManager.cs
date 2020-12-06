@@ -13,6 +13,9 @@ namespace ssb
         public Vector3 TopRight     { private set; get; }
         public Vector3 BottomLeft   { private set; get; }
 
+        public float _Width         { private set; get; }
+        public float _Height        { private set; get; }
+
         #endregion
 
         #region フィールド
@@ -33,6 +36,9 @@ namespace ssb
 
             TopRight = _MainCam.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0.0f));
             TopRight.Scale(new Vector3(1f, -1f, 1f));
+
+            _Width  = TopRight.x - BottomLeft.x;
+            _Height = TopRight.y - BottomLeft.y;
         }
 
         #endregion // 基本
