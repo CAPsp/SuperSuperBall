@@ -40,36 +40,29 @@ namespace ssb
 
         private void LateUpdate()
         {
-            // PL生存確認
-            if(_CurrentPLObj == null)
+            // PL生存確認。死んでたら残機残っている場合に生成
+            if(_CurrentPLObj == null && _CurrentLife > 0)
             {
                 _CurrentLife--;
 
-                // 残機0でGameOverへ遷移
-                if (_CurrentLife <= 0)
-                {
-                    // ゲームオーバー処理
-                }
-                else
-                {
-                    Vector3 spawnPos = Vector3.zero;
-                    spawnPos.x = CameraManager.Instance.TopRight.x - (CameraManager.Instance._Width / 2f);
-                    spawnPos.y = CameraManager.Instance.TopRight.y - (CameraManager.Instance._Height *  (3f / 4f));
-                    spawn(spawnPos);
-                }
+                // 残機が残っていたらＰＬ生成
+                Vector3 spawnPos = Vector3.zero;
+                spawnPos.x = CameraManager.Instance.TopRight.x - (CameraManager.Instance._Width / 2f);
+                spawnPos.y = CameraManager.Instance.TopRight.y - (CameraManager.Instance._Height *  (3f / 4f));
+                spawn(spawnPos);
             }
         }
 
         #endregion
 
-        #region 公開メソッド
+        #region 非公開メソッド
 
         // PL生成
-        void spawn(Vector3 pos)
+        private void spawn(Vector3 pos)
         {
              _CurrentPLObj = Instantiate(_PLPrefab, pos, Quaternion.identity, _PLInstObj.transform);
         }
 
-        #endregion  // 公開メソッド
+        #endregion // 非公開メソッド
     }
 }

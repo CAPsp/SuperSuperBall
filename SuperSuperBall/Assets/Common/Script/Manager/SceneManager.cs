@@ -29,7 +29,9 @@ namespace ssb
         #region フィールド
 
         [SerializeField]
-        private List<GameObject> _SceneList = new List<GameObject>();
+        private List<GameObject> _ScenePrefabList = new List<GameObject>();
+
+        private GameObject _GenGamePrefab = null;
 
         #endregion // フィールド
 
@@ -40,21 +42,6 @@ namespace ssb
             changeScene(SceneName.Title);
         }
 
-        private void Update()
-        {
-            // DEBUG: キャンセルボタンで次シーン遷移
-            if(InputManager.Instance.isCancel)
-            {
-                int nextScene = (int)_CurrentScene + 1;
-                if(nextScene >= (int)SceneName.Max)
-                {
-                    nextScene = 0;
-                }
-
-                changeScene((SceneName)nextScene);
-            }
-        }
-
         #endregion  // 基本
 
         #region 公開メソッド
@@ -62,18 +49,14 @@ namespace ssb
         public void changeScene(SceneName nextScene)
         {
             // 既にシーン再生時は遷移処理を行わない
-            if(nextScene == _CurrentScene && _SceneList[(int)_CurrentScene].activeSelf)
+            if (nextScene == _CurrentScene && _GenGamePrefab != null)
             {
                 return;
             }
-            _SceneList[(int)_CurrentScene].SetActive(false);
 
-            switch (nextScene)
-            {
-                case SceneName.Title:  _SceneList[(int)nextScene].SetActive(true);  break;
-                case SceneName.Game:   _SceneList[(int)nextScene].SetActive(true);  break;
-                case SceneName.Result: _SceneList[(int)nextScene].SetActive(true);  break;
-            }
+            Destroy(_GenGamePrefab);
+
+            _GenGamePrefab = Instantiate(_ScenePrefabList[(int)nextScene]);
 
             _CurrentScene = nextScene;
         }

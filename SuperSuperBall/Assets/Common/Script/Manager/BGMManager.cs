@@ -43,6 +43,11 @@ namespace ssb
             _AudioSource.Play();
         }
 
+        public void stopCurrentBGM()
+        {
+            _AudioSource.Stop();
+        }
+
         #endregion // 公開メソッド
 
     }
