@@ -45,8 +45,11 @@ namespace ssb.state
             }
 
             // 基点となる場所に戻ろうとする
-            Vector3 move = (_Owner._BasePos - _Owner.gameObject.transform.position).normalized * ParamManager.Instance.getParam<Em1Param>()._MoveSpeedSec * Time.deltaTime;
-            _Owner.addSpeed(move);
+            if((_Owner._BasePos - _Owner.gameObject.transform.position).magnitude >= 0.5f)
+            {
+                Vector3 move = (_Owner._BasePos - _Owner.gameObject.transform.position).normalized * ParamManager.Instance.getParam<Em1Param>()._MoveSpeedSec * Time.deltaTime;
+                _Owner.addSpeed(move);
+            }
         }
 
         public override void exit()

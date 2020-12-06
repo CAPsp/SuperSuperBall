@@ -35,7 +35,7 @@ namespace ssb
             _Hp             = ParamManager.Instance.getParam<Em1Param>()._Hp;
             _Speed          = Vector3.zero;
             _StateMachine   = new StateMachine(new Em1StateNormal(this), this);
-            _BasePos        = transform.position;
+            _BasePos        = transform.position - new Vector3(0f, 5f, 0f);   // 若干前方を基点とする
         }
 
         // Update is called once per frame
@@ -57,26 +57,25 @@ namespace ssb
         }
 
         // GUIとして描画する部分(Debug)
-        private void OnGUI()
-        {
+        //private void OnGUI()
+        //{
+        //    Vector2 pos = new Vector2(
+        //        transform.position.x - CameraManager.Instance.BottomLeft.x,
+        //        (-1) * transform.position.y - CameraManager.Instance.BottomLeft.y
+        //    );
 
-            Vector2 pos = new Vector2(
-                transform.position.x - CameraManager.Instance.BottomLeft.x,
-                (-1) * transform.position.y - CameraManager.Instance.BottomLeft.y
-            );
+        //    GUI.Label(new Rect(
+        //        pos.x * 40,
+        //        pos.y * 40,
+        //        30,
+        //        30), _Hp.ToString(), GUI.skin.box);
 
-            GUI.Label(new Rect(
-                pos.x * 40,
-                pos.y * 40,
-                30,
-                30), _Hp.ToString(), GUI.skin.box);
-
-            GUI.Label(new Rect(
-                pos.x * 40,
-                pos.y * 40 + 30,
-                150,
-                30), _StateMachine._CurrentState.ToString(), GUI.skin.box);
-        }
+        //    GUI.Label(new Rect(
+        //        pos.x * 40,
+        //        pos.y * 40 + 30,
+        //        150,
+        //        30), _StateMachine._CurrentState.ToString(), GUI.skin.box);
+        //}
 
         #endregion // 基本
 
@@ -161,7 +160,7 @@ namespace ssb
             nextPos += _Speed * Time.deltaTime;
 
             // 画面外に出た場合は跳ね返る
-            if (!(CameraManager.Instance.checkInsideScreen(nextPos)))
+            if (!(CameraManager.Instance.checkInsideScreen(nextPos)) && !(_StateMachine._CurrentState is Em1StateNormal))
             {
                 Vector3 topRight = CameraManager.Instance.TopRight;
                 Vector3 bottomLeft = CameraManager.Instance.BottomLeft;

@@ -27,7 +27,7 @@ namespace ssb
 
         #region 基本
 
-        private void Start()
+        private void Awake()
         {
             _AudioSource = GetComponent<AudioSource>();
         }

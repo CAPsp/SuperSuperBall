@@ -49,10 +49,12 @@ namespace ssb
             _GameTimeSec = 0f;
 
             // DEBUG
-            _SpawnQueue.Enqueue(new SpawnData(1, 0f,    0f));
+            _SpawnQueue.Enqueue(new SpawnData(1, 0f,    1f));
+            _SpawnQueue.Enqueue(new SpawnData(1, -3f,   1f));
             _SpawnQueue.Enqueue(new SpawnData(1, 3f,    1f));
-            _SpawnQueue.Enqueue(new SpawnData(1, -3f,   3f));
-            _SpawnQueue.Enqueue(new SpawnData(1, 0f,    5f));
+
+            _SpawnQueue.Enqueue(new SpawnData(1, -5f,   5f));
+            _SpawnQueue.Enqueue(new SpawnData(1, 5f,    5f));
         }
 
         private void Update()
@@ -63,6 +65,7 @@ namespace ssb
                 return;
             }
 
+            // 時間経過で敵がスポーン
             _GameTimeSec += Time.deltaTime;
             if(_SpawnQueue.Peek()._sec <= _GameTimeSec)
             {
@@ -79,7 +82,7 @@ namespace ssb
                 Instantiate
                     (
                         genPrefab,
-                        new Vector3(data._x, CameraManager.Instance.TopRight.y - 2f, 0f),
+                        new Vector3(data._x, CameraManager.Instance.TopRight.y + 1f, 0f),
                         Quaternion.identity,
                         _InstObj.transform
                     );    
