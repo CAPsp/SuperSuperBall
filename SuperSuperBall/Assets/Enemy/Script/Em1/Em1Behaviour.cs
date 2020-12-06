@@ -202,6 +202,7 @@ namespace ssb
             _Hp -= damage;
             if (_Hp <= 0)
             {
+                EnemySpawnManager.Instance._SpawnCnt--;
                 Destroy(this.gameObject);
             }
             else

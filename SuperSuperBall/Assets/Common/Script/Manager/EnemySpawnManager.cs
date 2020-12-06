@@ -13,19 +13,25 @@ namespace ssb
         #region クラス
         private class SpawnData
         {
-            public int _id     = 1;      // 生成される敵ID
-            public float _sec  = 0f;     // 生成時間
-            public float _x    = 0f;
+            public int _id          = 1;            // 生成される敵ID
+            public float _sec       = 0f;           // 生成時間
+            public Vector2 _pos     = Vector2.zero; // 生成場所　
 
-            public SpawnData(int id, float x, float sec)
+            public SpawnData(int id, Vector2 pos, float sec)
             {
                 _id     = id;
-                _x      = x;
+                _pos    = pos;
                 _sec    = sec;
             }
         }
 
         #endregion // クラス
+
+        #region プロパティ
+
+        public int _SpawnCnt { set; get; }
+
+        #endregion // プロパティ
 
         #region フィールド
 
@@ -46,22 +52,28 @@ namespace ssb
 
         private void Start()
         {
-            _GameTimeSec = 0f;
+            _GameTimeSec    = 0f;
+            _SpawnCnt       = 0;
 
             // DEBUG
-            _SpawnQueue.Enqueue(new SpawnData(1, 0f,    1f));
-            _SpawnQueue.Enqueue(new SpawnData(1, -3f,   1f));
-            _SpawnQueue.Enqueue(new SpawnData(1, 3f,    1f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(0f, 1f), 1f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(1f, 1f),   1f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-1f, 1f),    1f));
 
-            _SpawnQueue.Enqueue(new SpawnData(1, -5f,   5f));
-            _SpawnQueue.Enqueue(new SpawnData(1, 5f,    5f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-2f, 1.5f),   5f));
+            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(2f, 1.5f),    5f));
         }
 
         private void Update()
         {
-            // スポーンする敵がもうないなら処理しない
+            // スポーンする敵がもういない場合
             if(_SpawnQueue.Count <= 0)
             {
+                // 敵が全滅している場合ゲームクリア
+                if(_SpawnCnt <= 0)
+                {
+                    GameManager.Instance.gameEnd();
+                }
                 return;
             }
 
@@ -82,14 +94,15 @@ namespace ssb
                 Instantiate
                     (
                         genPrefab,
-                        new Vector3(data._x, CameraManager.Instance.TopRight.y + 1f, 0f),
+                        new Vector3(data._pos.x, CameraManager.Instance.TopRight.y + data._pos.y, 0f),
                         Quaternion.identity,
                         _InstObj.transform
-                    );    
+                    );
+
+                _SpawnCnt++;
             }
         }
 
         #endregion // 基本
-
     }
 }
