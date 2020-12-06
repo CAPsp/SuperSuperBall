@@ -29,5 +29,8 @@ namespace ssb.param
 
         // 移動速度
         public float _MoveSpeedSec          = 0f;
+
+        // 死亡確定時、消えるまでのDelay
+        public float _DeathDelaySec         = 0f;
     }
 }

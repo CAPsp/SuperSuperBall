@@ -117,32 +117,41 @@ namespace ssb.state
 
         public override void enter()
         {
+            _TimerSec = 0f;
+
             // HP0以下で死亡することが決まっている場合、色を変化させる
             if (_Owner._Hp <= 0)
             {
                 _Owner.GetComponent<SpriteRenderer>().color = Color.black;
+                _TimerSec = ParamManager.Instance.getParam<Em1Param>()._DeathDelaySec;
             }
         }
 
         public override void update()
         {
-            // 速度が一定未満になった場合
-            if (_Owner._Speed.magnitude < ParamManager.Instance.getParam<Em1Param>()._NotControllSpeedLimit)
+            if (_TimerSec > 0f)
             {
-                // HPが0以下で死亡する
-                if (_Owner._Hp <= 0)
-                {
-                    EnemySpawnManager.Instance._SpawnCnt--;
-                    GameObject.Destroy(_Owner.gameObject);
-                }
+                _TimerSec -= Time.deltaTime;
+            }
 
+            // 速度が一定未満になった場合 or 死亡確定でn秒飛んだ場合
+            if (_Owner._Speed.magnitude < ParamManager.Instance.getParam<Em1Param>()._NotControllSpeedLimit ||
+                (_Owner._Hp <= 0 && _TimerSec <= 0f))
+            {
                 _Owner.resetSpeed();
                 _Owner._StateMachine.changeState(new Em1StateNormal(_Owner));
             }
+
         }
 
         public override void exit()
         {
+            // HPが0以下で死亡する
+            if (_Owner._Hp <= 0)
+            {
+                EnemySpawnManager.Instance._SpawnCnt--;
+                GameObject.Destroy(_Owner.gameObject);
+            }
         }
     }
 

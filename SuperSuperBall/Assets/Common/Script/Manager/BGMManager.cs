@@ -27,8 +27,9 @@ namespace ssb
 
         #region 基本
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             _AudioSource = GetComponent<AudioSource>();
         }
 

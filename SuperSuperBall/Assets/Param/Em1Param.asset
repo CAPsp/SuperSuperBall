@@ -20,3 +20,4 @@ MonoBehaviour:
   _SpeedByExplosion: 20
   _TimeSecOfReHitSameObj: 0.5
   _MoveSpeedSec: 2
+  _DeathDelaySec: 0.3
