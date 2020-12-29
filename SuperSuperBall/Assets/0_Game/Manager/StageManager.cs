@@ -16,7 +16,7 @@ namespace ssb
 
         #region フィールド
 
-        private float _Radius = 20.0f;  // 円形ステージの半径
+        private float _Radius = 40.0f;  // 円形ステージの半径
 
         #endregion // フィールド
 
