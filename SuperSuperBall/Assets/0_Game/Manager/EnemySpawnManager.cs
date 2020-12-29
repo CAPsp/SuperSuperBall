@@ -9,114 +9,72 @@ namespace ssb
     // 敵生成管理クラス
     public class EnemySpawnManager : SingletonMonoBehaviour<EnemySpawnManager>
     {
+        #region 定数
 
-        #region クラス
-        private class SpawnData
-        {
-            public int _id          = 1;            // 生成される敵ID
-            public float _sec       = 0f;           // 生成時間
-            public Vector2 _pos     = Vector2.zero; // 生成場所　
+        // スポーン生成に必要とするマージン
+        private static readonly float SPAWN_AREA_MARGIN = 2f;
 
-            public SpawnData(int id, Vector2 pos, float sec)
-            {
-                _id     = id;
-                _pos    = pos;
-                _sec    = sec;
-            }
-        }
+        // スポーンに要するループ回数の上限
+        private static readonly int UPPER_LIMIT_OF_SPAWN_LOOP_CNT = 10;
 
-        #endregion // クラス
-
-        #region プロパティ
-
-        public int _SpawnCnt { set; get; }
-
-        #endregion // プロパティ
+        #endregion
 
         #region フィールド
 
-        // ゲーム開始からの時間を計測
-        private float _GameTimeSec = 0f;
-
-        private Queue<SpawnData> _SpawnQueue = new Queue<SpawnData>();
-
+        // 敵生成先オブジェクト
         [SerializeField]
         private GameObject _InstObj = null;
 
+        // 敵プレハブリスト
         [SerializeField]
-        private GameObject _Em1Prefab = null;
+        private List<GameObject>_EmPrefabList = null;
+
+        private float _SpawnSecTimer = 0f;  // 敵スポーンタイマー
+        private float _SpawnInterval = 2f;  // 敵スポーンまでの時間（だんだん短くなる）
 
         #endregion // フィールド
 
         #region 基本
 
-        private void Start()
-        {
-            _GameTimeSec    = 0f;
-            _SpawnCnt       = 0;
-
-            // -----------------------------
-            // DEBUG
-
-            // Wave1
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(0f,  1f), 1f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(1f,  1f), 1f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-1f, 1f), 1f));
-
-            // Wave2
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-1f, 1.5f), 4f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-2f, 1.5f), 4f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-3f, 1.5f), 4f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-4f, 1.5f), 4f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(1f,  1.5f), 6f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(2f,  1.5f), 6f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(3f,  1.5f), 6f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(4f,  1.5f), 6f));
-
-            // Wave3
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(0f, 1.5f), 12f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(1f, 1.5f), 12f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(2f, 1.5f), 12f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-1f, 1.5f), 12f));
-            _SpawnQueue.Enqueue(new SpawnData(1, new Vector2(-2f, 1.5f), 12f));
-        }
-
         private void Update()
         {
-            // スポーンする敵がもういない場合
-            if(_SpawnQueue.Count <= 0)
-            {
-                // 敵が全滅している場合ゲームクリア
-                if(_SpawnCnt <= 0)
-                {
-                    GameManager.Instance.gameEnd();
-                }
-                return;
-            }
-
             // 時間経過で敵がスポーン
-            _GameTimeSec += Time.deltaTime;
-            if(_SpawnQueue.Peek()._sec <= _GameTimeSec)
+            _SpawnSecTimer -= Time.deltaTime;
+            if(_SpawnSecTimer <= 0f)
             {
-                SpawnData data = _SpawnQueue.Dequeue();
-
-                GameObject genPrefab = null;
-                switch(data._id)
+                // 敵スポーンはカメラ外かつステージ内のランダムな座標(極座標で計算)
+                Vector3 spawnPos = Vector3.zero;
+                float len, theta;
+                int i;
+                for (i = 0; i < UPPER_LIMIT_OF_SPAWN_LOOP_CNT; i++)
                 {
-                    case 1: genPrefab = _Em1Prefab; break;
-
-                    default: genPrefab = _Em1Prefab; break;
+                    len         = Random.Range(0f, StageManager.Instance._Radius - SPAWN_AREA_MARGIN);
+                    theta       = Random.Range(0f, Mathf.PI * 2f);
+                    spawnPos    = new Vector3(len * Mathf.Cos(theta), len * Mathf.Sin(theta), 0f);
+                    if (!(CameraManager.Instance.checkInsideScreen(spawnPos)))
+                    {
+                        break;
+                    }
                 }
 
-                Instantiate
-                    (
-                        genPrefab,
-                        new Vector3(data._pos.x, data._pos.y, 0f),
-                        Quaternion.identity,
-                        _InstObj.transform
-                    );
+                if (i >= UPPER_LIMIT_OF_SPAWN_LOOP_CNT)
+                {
+#if UNITY_EDITOR
+                    Debug.LogError("EnemySpawnManager::Update | 敵スポーンに要するループ回数の上限に達したので敵はスポーンしません");
+#endif
+                }
+                else
+                {
+                    Instantiate
+                        (
+                            _EmPrefabList[0],
+                            spawnPos,
+                            Quaternion.identity,
+                            _InstObj.transform
+                        );
+                }
 
-                _SpawnCnt++;
+                _SpawnSecTimer = _SpawnInterval;
             }
         }
 

@@ -70,9 +70,7 @@ namespace ssb
         {
             // 現在の画面上における左下と右上座標をとる
             Vector3 bottomLeft = _MainCamera.ScreenToWorldPoint(Vector3.zero);
-            bottomLeft.Scale(new Vector3(1f, -1f, 1f));
             Vector3 topRight = _MainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0.0f));
-            topRight.Scale(new Vector3(1f, -1f, 1f));
 
             return (bottomLeft.x < pos.x) && (pos.x < topRight.x) && (bottomLeft.y < pos.y) && (pos.y < topRight.y);
         }

@@ -2,7 +2,7 @@
 
 namespace ssb.param
 {
-    // PL関連のパラメータ管理
+    // 敵１関連のパラメータ管理
     [CreateAssetMenu(fileName = "Em1Param", menuName = "Param/Em1Param")]
     class Em1Param : ScriptableObject
     {
@@ -32,5 +32,8 @@ namespace ssb.param
 
         // 死亡確定時、消えるまでのDelay
         public float _DeathDelaySec         = 0f;
+
+        // PLに近づく距離上限
+        public float _LimitDistFromPL       = 0f;
     }
 }

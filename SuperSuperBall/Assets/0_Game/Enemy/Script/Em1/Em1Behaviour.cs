@@ -35,7 +35,6 @@ namespace ssb
             _Hp             = ParamManager.Instance.getParam<Em1Param>()._Hp;
             _Speed          = Vector3.zero;
             _StateMachine   = new StateMachine(new Em1StateNormal(this), this);
-            _BasePos        = transform.position - new Vector3(0f, 5f, 0f);   // 若干前方を基点とする
         }
 
         // Update is called once per frame
@@ -154,46 +153,22 @@ namespace ssb
         // 移動関係の更新
         private void moveUpdate()
         {
-            Vector3 nextPos = gameObject.transform.position;
-            Vector3 nextSpeed = _Speed;
-
-            nextPos += _Speed * Time.deltaTime;
-
-            // 画面外に出た場合は跳ね返る
-            //if (!(CameraManager.Instance.checkInsideScreen(nextPos)) && !(_StateMachine._CurrentState is Em1StateNormal))
-            //{
-            //    Vector3 topRight = CameraManager.Instance.TopRight;
-            //    Vector3 bottomLeft = CameraManager.Instance.BottomLeft;
-
-            //    if (nextPos.x < bottomLeft.x)
-            //    {
-            //        nextPos.x = bottomLeft.x + (bottomLeft.x - nextPos.x);
-            //        nextSpeed.x *= (-1.0f);
-            //    }
-            //    else if (topRight.x < nextPos.x)
-            //    {
-            //        nextPos.x = topRight.x - (nextPos.x - topRight.x);
-            //        nextSpeed.x *= (-1.0f);
-            //    }
-
-            //    if (nextPos.y < bottomLeft.y)
-            //    {
-            //        nextPos.y = bottomLeft.y + (bottomLeft.y - nextPos.y);
-            //        nextSpeed.y *= (-1.0f);
-            //    }
-            //    else if (topRight.y < nextPos.y)
-            //    {
-            //        nextPos.y = topRight.y - (nextPos.y - topRight.y);
-            //        nextSpeed.y *= (-1.0f);
-            //    }
-            //}
-
             // 速度の減算
+            Vector3 nextSpeed = _Speed;
             nextSpeed.x -= (ParamManager.Instance.getParam<Em1Param>()._SpeedResistance * Time.deltaTime * _Speed.x);
             nextSpeed.y -= (ParamManager.Instance.getParam<Em1Param>()._SpeedResistance * Time.deltaTime * _Speed.y);
-
-            gameObject.transform.position = nextPos;
             _Speed = nextSpeed;
+
+            gameObject.transform.position += _Speed * Time.deltaTime;
+
+            // 画面外に出た場合は跳ね返る
+            Vector3 nextPos;
+            if (!(StageManager.Instance.checkCharaInStageAndCalcReturnStage(this, out nextPos, out nextSpeed)))
+            {
+                gameObject.transform.position = nextPos;
+                _Speed = nextSpeed;
+            }
+
         }
 
         // ダメージを受けた際の処理

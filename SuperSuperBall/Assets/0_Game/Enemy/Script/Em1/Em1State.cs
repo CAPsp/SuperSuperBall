@@ -24,14 +24,19 @@ namespace ssb.state
 
         public override void update()
         {
+            // PLが存在しない場合は処理しない　
+            if(PLManager.Instance._CurrentPLObj == null)
+            {
+                return;
+            }
+
             // 弾を生成する
             _ShotGenTimerSec += Time.deltaTime;
             if (_ShotGenTimerSec >= ParamManager.Instance.getParam<Em1Param>()._ShotGenIntervalSec)
             {
                 if (GameObject.FindGameObjectWithTag("Player") != null)
                 {
-                    Vector3 plPos = GameObject.FindGameObjectWithTag("Player").transform.position;
-                    Vector3 angle = ((plPos + Unity2DUtil.genRandomVector2(1.0f)) - _Owner.transform.position).normalized;
+                    Vector3 angle = ((PLManager.Instance._CurrentPLObj.transform.position + Unity2DUtil.genRandomVector2(1.0f)) - _Owner.transform.position).normalized;
 
                     EnemyShotManager.Instance.shotGen
                         (
@@ -44,10 +49,10 @@ namespace ssb.state
                 }
             }
 
-            // 基点となる場所に戻ろうとする
-            if((_Owner._BasePos - _Owner.gameObject.transform.position).magnitude >= 0.5f)
+            // プレイヤーに一定の範囲まで近づこうとする
+            if((PLManager.Instance._CurrentPLObj.transform.position - _Owner.gameObject.transform.position).magnitude > ParamManager.Instance.getParam<Em1Param>()._LimitDistFromPL)
             {
-                Vector3 move = (_Owner._BasePos - _Owner.gameObject.transform.position).normalized * ParamManager.Instance.getParam<Em1Param>()._MoveSpeedSec * Time.deltaTime;
+                Vector3 move = (PLManager.Instance._CurrentPLObj.transform.position - _Owner.gameObject.transform.position).normalized * ParamManager.Instance.getParam<Em1Param>()._MoveSpeedSec * Time.deltaTime;
                 _Owner.addSpeed(move);
             }
         }
@@ -149,7 +154,6 @@ namespace ssb.state
             // HPが0以下で死亡する
             if (_Owner._Hp <= 0)
             {
-                EnemySpawnManager.Instance._SpawnCnt--;
                 GameObject.Destroy(_Owner.gameObject);
             }
         }

@@ -14,9 +14,6 @@ namespace ssb
 
         public int _Hp { protected set; get; }
 
-        // 基点となる座標
-        public Vector3 _BasePos { protected set; get; }
-
         #endregion // プロパティ
 
 
