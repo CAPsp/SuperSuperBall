@@ -111,7 +111,7 @@ namespace ssb
                 Instantiate
                     (
                         genPrefab,
-                        new Vector3(data._pos.x, CameraManager.Instance.TopRight.y + data._pos.y, 0f),
+                        new Vector3(data._pos.x, data._pos.y, 0f),
                         Quaternion.identity,
                         _InstObj.transform
                     );

@@ -47,8 +47,8 @@ namespace ssb
 
                 // 残機が残っていたらＰＬ生成
                 Vector3 spawnPos = Vector3.zero;
-                spawnPos.x = CameraManager.Instance.TopRight.x - (CameraManager.Instance._Width / 2f);
-                spawnPos.y = CameraManager.Instance.TopRight.y - (CameraManager.Instance._Height *  (3f / 4f));
+                //spawnPos.x = CameraManager.Instance.TopRight.x - (CameraManager.Instance._Width / 2f);
+                //spawnPos.y = CameraManager.Instance.TopRight.y - (CameraManager.Instance._Height *  (3f / 4f));
                 spawn(spawnPos);
             }
         }
@@ -61,6 +61,7 @@ namespace ssb
         private void spawn(Vector3 pos)
         {
              _CurrentPLObj = Instantiate(_PLPrefab, pos, Quaternion.identity, _PLInstObj.transform);
+            CameraManager.Instance.registerTargetObj(_CurrentPLObj);
         }
 
         #endregion // 非公開メソッド

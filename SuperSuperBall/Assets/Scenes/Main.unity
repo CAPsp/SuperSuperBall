@@ -307,7 +307,7 @@ PrefabInstance:
     - target: {fileID: 3750002642856870564, guid: bd27c8eed23b5aa429610f5f85643b8f,
         type: 3}
       propertyPath: m_Name
-      value: Manager
+      value: Managers
       objectReference: {fileID: 0}
     - target: {fileID: 3750002642856870567, guid: bd27c8eed23b5aa429610f5f85643b8f,
         type: 3}
@@ -364,6 +364,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3750002643857154097, guid: bd27c8eed23b5aa429610f5f85643b8f,
+        type: 3}
+      propertyPath: _MainCamera
+      value: 
+      objectReference: {fileID: 863455742}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bd27c8eed23b5aa429610f5f85643b8f, type: 3}
 --- !u!4 &864557132 stripped

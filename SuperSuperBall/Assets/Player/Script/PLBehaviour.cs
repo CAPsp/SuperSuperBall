@@ -138,29 +138,29 @@ namespace ssb
             nextPos += new Vector3(x, y, 0f) * ParamManager.Instance.getParam<PLParam>()._MoveSpeedPerSec * Time.deltaTime;
 
             // 画面外に出ないよう調整
-            if (!(CameraManager.Instance.checkInsideScreen(nextPos)))
-            {
-                Vector3 topRight    = CameraManager.Instance.TopRight;
-                Vector3 bottomLeft  = CameraManager.Instance.BottomLeft;
+            //if (!(CameraManager.Instance.checkInsideScreen(nextPos)))
+            //{
+            //    Vector3 topRight    = CameraManager.Instance.TopRight;
+            //    Vector3 bottomLeft  = CameraManager.Instance.BottomLeft;
 
-                if (nextPos.x < bottomLeft.x)
-                {
-                    nextPos.x = bottomLeft.x;
-                }
-                else if (topRight.x < nextPos.x)
-                {
-                    nextPos.x = topRight.x;
-                }
+            //    if (nextPos.x < bottomLeft.x)
+            //    {
+            //        nextPos.x = bottomLeft.x;
+            //    }
+            //    else if (topRight.x < nextPos.x)
+            //    {
+            //        nextPos.x = topRight.x;
+            //    }
 
-                if (nextPos.y < bottomLeft.y)
-                {
-                    nextPos.y = bottomLeft.y;
-                }
-                else if (topRight.y < nextPos.y)
-                {
-                    nextPos.y = topRight.y;
-                }
-            }
+            //    if (nextPos.y < bottomLeft.y)
+            //    {
+            //        nextPos.y = bottomLeft.y;
+            //    }
+            //    else if (topRight.y < nextPos.y)
+            //    {
+            //        nextPos.y = topRight.y;
+            //    }
+            //}
 
             gameObject.transform.position = nextPos;
         }
@@ -174,33 +174,33 @@ namespace ssb
             nextPos += _Speed * Time.deltaTime;
 
             // 画面外に出た場合は跳ね返る
-            if (!(CameraManager.Instance.checkInsideScreen(nextPos)))
-            {
-                Vector3 topRight = CameraManager.Instance.TopRight;
-                Vector3 bottomLeft = CameraManager.Instance.BottomLeft;
+            //if (!(CameraManager.Instance.checkInsideScreen(nextPos)))
+            //{
+            //    Vector3 topRight = CameraManager.Instance.TopRight;
+            //    Vector3 bottomLeft = CameraManager.Instance.BottomLeft;
 
-                if (nextPos.x < bottomLeft.x)
-                {
-                    nextPos.x = bottomLeft.x + (bottomLeft.x - nextPos.x);
-                    nextSpeed.x *= (-1.0f);
-                }
-                else if (topRight.x < nextPos.x)
-                {
-                    nextPos.x = topRight.x - (nextPos.x - topRight.x);
-                    nextSpeed.x *= (-1.0f);
-                }
+            //    if (nextPos.x < bottomLeft.x)
+            //    {
+            //        nextPos.x = bottomLeft.x + (bottomLeft.x - nextPos.x);
+            //        nextSpeed.x *= (-1.0f);
+            //    }
+            //    else if (topRight.x < nextPos.x)
+            //    {
+            //        nextPos.x = topRight.x - (nextPos.x - topRight.x);
+            //        nextSpeed.x *= (-1.0f);
+            //    }
 
-                if (nextPos.y < bottomLeft.y)
-                {
-                    nextPos.y = bottomLeft.y + (bottomLeft.y - nextPos.y);
-                    nextSpeed.y *= (-1.0f);
-                }
-                else if (topRight.y < nextPos.y)
-                {
-                    nextPos.y = topRight.y - (nextPos.y - topRight.y);
-                    nextSpeed.y *= (-1.0f);
-                }
-            }
+            //    if (nextPos.y < bottomLeft.y)
+            //    {
+            //        nextPos.y = bottomLeft.y + (bottomLeft.y - nextPos.y);
+            //        nextSpeed.y *= (-1.0f);
+            //    }
+            //    else if (topRight.y < nextPos.y)
+            //    {
+            //        nextPos.y = topRight.y - (nextPos.y - topRight.y);
+            //        nextSpeed.y *= (-1.0f);
+            //    }
+            //}
 
             gameObject.transform.position = nextPos;
             _Speed = nextSpeed;
@@ -231,7 +231,7 @@ namespace ssb
                 float scale = _Speed.magnitude / ParamManager.Instance.getParam<PLParam>()._ExplosionDiv;
                 explosion.transform.localScale = new Vector3(scale, scale, scale);
 
-                // 火っとストップ
+                // ヒットストップ
                 RistrictManager.Instance.stop(0.002f * _Speed.magnitude);
 
                 _Speed = Vector3.zero;

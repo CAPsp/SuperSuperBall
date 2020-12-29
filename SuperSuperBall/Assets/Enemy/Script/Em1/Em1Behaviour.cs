@@ -160,33 +160,33 @@ namespace ssb
             nextPos += _Speed * Time.deltaTime;
 
             // 画面外に出た場合は跳ね返る
-            if (!(CameraManager.Instance.checkInsideScreen(nextPos)) && !(_StateMachine._CurrentState is Em1StateNormal))
-            {
-                Vector3 topRight = CameraManager.Instance.TopRight;
-                Vector3 bottomLeft = CameraManager.Instance.BottomLeft;
+            //if (!(CameraManager.Instance.checkInsideScreen(nextPos)) && !(_StateMachine._CurrentState is Em1StateNormal))
+            //{
+            //    Vector3 topRight = CameraManager.Instance.TopRight;
+            //    Vector3 bottomLeft = CameraManager.Instance.BottomLeft;
 
-                if (nextPos.x < bottomLeft.x)
-                {
-                    nextPos.x = bottomLeft.x + (bottomLeft.x - nextPos.x);
-                    nextSpeed.x *= (-1.0f);
-                }
-                else if (topRight.x < nextPos.x)
-                {
-                    nextPos.x = topRight.x - (nextPos.x - topRight.x);
-                    nextSpeed.x *= (-1.0f);
-                }
+            //    if (nextPos.x < bottomLeft.x)
+            //    {
+            //        nextPos.x = bottomLeft.x + (bottomLeft.x - nextPos.x);
+            //        nextSpeed.x *= (-1.0f);
+            //    }
+            //    else if (topRight.x < nextPos.x)
+            //    {
+            //        nextPos.x = topRight.x - (nextPos.x - topRight.x);
+            //        nextSpeed.x *= (-1.0f);
+            //    }
 
-                if (nextPos.y < bottomLeft.y)
-                {
-                    nextPos.y = bottomLeft.y + (bottomLeft.y - nextPos.y);
-                    nextSpeed.y *= (-1.0f);
-                }
-                else if (topRight.y < nextPos.y)
-                {
-                    nextPos.y = topRight.y - (nextPos.y - topRight.y);
-                    nextSpeed.y *= (-1.0f);
-                }
-            }
+            //    if (nextPos.y < bottomLeft.y)
+            //    {
+            //        nextPos.y = bottomLeft.y + (bottomLeft.y - nextPos.y);
+            //        nextSpeed.y *= (-1.0f);
+            //    }
+            //    else if (topRight.y < nextPos.y)
+            //    {
+            //        nextPos.y = topRight.y - (nextPos.y - topRight.y);
+            //        nextSpeed.y *= (-1.0f);
+            //    }
+            //}
 
             // 速度の減算
             nextSpeed.x -= (ParamManager.Instance.getParam<Em1Param>()._SpeedResistance * Time.deltaTime * _Speed.x);
