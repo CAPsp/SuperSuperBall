@@ -13,8 +13,7 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
-/[Aa]ssets/EffectExamples/
-/[Aa]ssets/JMO Assets/
+/[Aa]ssets/ExternalResource/
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
