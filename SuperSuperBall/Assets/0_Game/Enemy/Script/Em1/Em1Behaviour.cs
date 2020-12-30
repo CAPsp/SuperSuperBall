@@ -32,9 +32,11 @@ namespace ssb
 
         private void Start()
         {
-            _Hp             = ParamManager.Instance.getParam<Em1Param>()._Hp;
-            _Speed          = Vector3.zero;
-            _StateMachine   = new StateMachine(new Em1StateNormal(this), this);
+            // 初期化
+            _Hp                 = ParamManager.Instance.getParam<Em1Param>()._Hp;
+            _Speed              = Vector3.zero;
+            _StateMachine       = new StateMachine(new Em1StateNormal(this), this);
+            _CollAttackPower    = 1;
         }
 
         // Update is called once per frame
@@ -85,12 +87,14 @@ namespace ssb
             // PLに当たった場合
             if (collision.gameObject.GetComponent<PLBehaviour>() != null)
             {
+                PLBehaviour pl = collision.gameObject.GetComponent<PLBehaviour>();
+
                 // PLから攻撃されたら吹っ飛ばされてHPが減る
-                if (collision.gameObject.GetComponent<PLBehaviour>()._StateMachine._CurrentState is PLStateShoot)
+                if (pl._StateMachine._CurrentState is PLStateShoot)
                 {
                     SEManager.Instance.playSE(SEManager.SEName.Hit);
                     _Speed = collision.gameObject.GetComponent<PLBehaviour>()._Speed;
-                    damage(1);
+                    damage(pl._CollAttackPower);
 
                     // パーティクル
                     ParticleManager.Instance.initiateParticle(ParticleManager.ParticleName.Hit, collision.contacts[0].point);
@@ -102,16 +106,18 @@ namespace ssb
             else if (   _StateMachine._CurrentState is Em1StateBlowOut &&
                         collision.gameObject.GetComponent<EnemyBehaviour>() != null)
             {
+                Em1Behaviour otherEm = collision.gameObject.GetComponent<Em1Behaviour>();
+
                 SEManager.Instance.playSE(SEManager.SEName.Hit);
-                damage(1);
+                damage(otherEm._CollAttackPower);
                 ParticleManager.Instance.initiateParticle(ParticleManager.ParticleName.Hit, collision.contacts[0].point);
 
                 Vector3 currentSpeed = _Speed;
-                _Speed = collision.gameObject.GetComponent<Em1Behaviour>()._Speed;
+                _Speed = otherEm._Speed;
 
                 // 当たった敵にも影響を与える
-                collision.gameObject.GetComponent<Em1Behaviour>()._Speed = currentSpeed;
-                collision.gameObject.GetComponent<Em1Behaviour>().damage(1);
+                otherEm._Speed = currentSpeed;
+                otherEm.damage(_CollAttackPower);
             }
 
         }

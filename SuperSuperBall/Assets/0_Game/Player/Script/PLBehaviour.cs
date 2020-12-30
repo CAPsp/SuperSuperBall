@@ -45,9 +45,10 @@ namespace ssb
             _EdgeCollider   = GetComponent<EdgeCollider2D>();
 
             // 初期化
-            _Speed         = Vector3.zero;
-            _StateMachine  = new StateMachine(new PLStateNormal(this), this);
-            _MutekiTimeSec = ParamManager.Instance.getParam<PLParam>()._MutekiTimeSec;
+            _Speed              = Vector3.zero;
+            _StateMachine       = new StateMachine(new PLStateNormal(this), this);
+            _MutekiTimeSec      = ParamManager.Instance.getParam<PLParam>()._MutekiTimeSec;
+            _CollAttackPower    = 2;
         }
 
         // Update is called once per frame

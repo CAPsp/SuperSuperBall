@@ -28,7 +28,11 @@ namespace ssb
         // 状態管理ステートマシン
         public StateMachine _StateMachine { protected set; get; }
 
-        public Vector3 _Speed { protected set; get; }
+        // 保持している速度
+        public Vector3 _Speed { protected set; get; }       = Vector3.zero;
+
+        // 直接ぶつかったときの攻撃力
+        public int _CollAttackPower { protected set; get; } = 0;
 
         #endregion // プロパティ
 

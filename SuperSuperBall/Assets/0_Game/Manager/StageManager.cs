@@ -12,7 +12,7 @@ namespace ssb
 
         public Vector3 _CenterPos { private set; get; } = Vector3.zero; // ステージ中心座標
 
-        public float _Radius { private set; get; } = 40.0f;             // 円形ステージの半径
+        public float _Radius { private set; get; } = 25.0f;             // 円形ステージの半径
 
         #endregion // プロパティ
 
