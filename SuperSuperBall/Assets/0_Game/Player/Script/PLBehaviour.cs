@@ -187,13 +187,12 @@ namespace ssb
                 explosion.transform.localScale = new Vector3(scale, scale, scale);
 
                 // ヒットストップ
-                RistrictManager.Instance.stop(0.002f * _Speed.magnitude);
+                RistrictManager.Instance.stop(ParamManager.Instance.getParam<PLParam>()._HitStopRate * _Speed.magnitude);
 
-                _Speed = Vector3.zero;
-                _MutekiTimeSec = (_MutekiTimeSec <= 0f) ? ParamManager.Instance.getParam<PLParam>()._MutekiTimeSec : _MutekiTimeSec;
+                // ステート変更
+                _StateMachine.changeState(new PLStateShootHitToEm(this));
             }
-
-            if (!(_StateMachine._CurrentState is PLStateShoot || _StateMachine._CurrentState is PLStateDeath) &&
+            else if (!(_StateMachine._CurrentState is PLStateShoot || _StateMachine._CurrentState is PLStateDeath) &&
                  _MutekiTimeSec <= 0.0f)
             {
                 death();

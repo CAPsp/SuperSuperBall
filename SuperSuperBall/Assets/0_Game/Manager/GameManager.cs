@@ -19,7 +19,7 @@ namespace ssb
         private void Update()
         {
             // PL残機0処理
-            if(PLManager.Instance._CurrentLife <= 0 && PLManager.Instance._CurrentPLObj == null)
+            if(PLManager.Instance._CurrentPLObj == null)
             {
                 gameEnd();
             }

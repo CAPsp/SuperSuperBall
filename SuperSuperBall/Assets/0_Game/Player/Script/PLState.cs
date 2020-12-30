@@ -144,10 +144,7 @@ namespace ssb.state
             _Owner = owner;
         }
 
-        public override void enter()
-        {
-
-        }
+        public override void enter(){}
 
         public override void update()
         {
@@ -166,10 +163,41 @@ namespace ssb.state
             }
         }
 
-        public override void exit()
-        {
+        public override void exit(){}
+    }
 
+    // 攻撃中に敵にヒットした場合
+    public class PLStateShootHitToEm : BaseState
+    {
+        private PLBehaviour _Owner;
+
+        public PLStateShootHitToEm(PLBehaviour owner)
+        {
+            _Owner          = owner;
         }
+
+        public override void enter(){}
+
+        public override void update()
+        {
+            // コントローラ入力を受け付け、受け付けた角度が現在の速度から反射するような角度だったらその方向に飛ぶ
+            Vector3 inputVec = new Vector3(InputManager.Instance.axisX, InputManager.Instance.axisY, 0f);
+
+            if (inputVec.magnitude > Mathf.Epsilon && Vector3.Dot(inputVec, _Owner._Speed.normalized) <= 0)
+            {
+                float speedMagnitude = _Owner._Speed.magnitude;
+                _Owner.resetSpeed();
+                _Owner.addSpeed(inputVec * speedMagnitude);
+            }
+            else
+            {
+                _Owner.resetSpeed();
+            }
+
+            _Owner._StateMachine.changeState(new PLStateShoot(_Owner));
+        }
+
+        public override void exit(){}
     }
 
     // 死亡時
