@@ -16,7 +16,7 @@ public class EffectExplosionBehaviour : MonoBehaviour
     void Awake()
     {
         _Collider = gameObject.GetComponent<CircleCollider2D>();
-        _TimeSec = 0.3f;
+        _TimeSec = 0.1f;
     }
 
     // Update is called once per frame
