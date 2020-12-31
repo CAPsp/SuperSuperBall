@@ -21,4 +21,4 @@ MonoBehaviour:
   _IgnoreSpeedLimit: 0.1
   _ExplosionDiv: 15
   _MutekiTimeSec: 1
-  _HitStopRate: 0.01
+  _HitStopRate: 0.02

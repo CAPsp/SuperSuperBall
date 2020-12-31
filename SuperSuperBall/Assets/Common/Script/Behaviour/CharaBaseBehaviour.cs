@@ -38,7 +38,7 @@ namespace ssb
 
         #region 基本
 
-        private void Start()
+        virtual protected void Start()
         {
             // 一時停止管理マネージャーに登録
             RistrictManager.Instance.registerBehaviour(this);

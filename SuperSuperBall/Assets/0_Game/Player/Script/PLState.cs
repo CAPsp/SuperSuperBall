@@ -50,6 +50,7 @@ namespace ssb.state
         public override void enter()
         {
             _FixedPos = _Owner.transform.position;
+            _Owner._ShotGuideArrowBehaviour.setState(PLShotGuideArrowBehaviour.ArrowState.Shot);
         }
 
         public override void update()
@@ -87,6 +88,7 @@ namespace ssb.state
 
         public override void exit()
         {
+            _Owner._ShotGuideArrowBehaviour.setState(PLShotGuideArrowBehaviour.ArrowState.Hide);
         }
     }
 
@@ -173,7 +175,8 @@ namespace ssb.state
 
         public PLStateShootHitToEm(PLBehaviour owner)
         {
-            _Owner          = owner;
+            _Owner = owner;
+            _Owner._ShotGuideArrowBehaviour.setState(PLShotGuideArrowBehaviour.ArrowState.Reflect);
         }
 
         public override void enter(){}
@@ -197,7 +200,10 @@ namespace ssb.state
             _Owner._StateMachine.changeState(new PLStateShoot(_Owner));
         }
 
-        public override void exit(){}
+        public override void exit()
+        {
+            _Owner._ShotGuideArrowBehaviour.setState(PLShotGuideArrowBehaviour.ArrowState.Hide);
+        }
     }
 
     // 死亡時

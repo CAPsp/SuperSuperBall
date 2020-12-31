@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 using ssb.param;
 using ssb.state;
@@ -19,6 +20,9 @@ namespace ssb
         // PL子要素に存在するPL背面描画用GameObject
         public GameObject _BackGameObj { private set; get; }
 
+        // PL子要素に存在するPLアクション補佐するガイド矢印制御Behaviour
+        public PLShotGuideArrowBehaviour _ShotGuideArrowBehaviour { private set; get; }
+
         #endregion // プロパティ
 
         #region メンバ変数
@@ -29,17 +33,27 @@ namespace ssb
         // 状態に合わせて使い分けるコライダ
         private CircleCollider2D _CricleCollider;
         private EdgeCollider2D _EdgeCollider;
-        
+
         #endregion // メンバ変数
 
         #region 基本
 
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
+
             // -------------------------------
             // 各種コンポーネント取得
-            _BodyGameObj = gameObject.transform.Find("Body").gameObject;
-            _BackGameObj = gameObject.transform.Find("Back").gameObject;
+            _BodyGameObj                = gameObject.transform.Find("Body").gameObject;
+            _BackGameObj                = gameObject.transform.Find("Back").gameObject;
+
+            // 矢印ガイド制御Behaviourの取得と設定
+            _ShotGuideArrowBehaviour    = gameObject.transform.GetComponentInChildren<PLShotGuideArrowBehaviour>();
+            if(_ShotGuideArrowBehaviour != null)
+            {
+                _ShotGuideArrowBehaviour.registerPLBehaviour(this);
+            }
+
 
             _CricleCollider = GetComponent<CircleCollider2D>();
             _EdgeCollider   = GetComponent<EdgeCollider2D>();
@@ -105,18 +119,16 @@ namespace ssb
                 
                 if(_MutekiTimeSec <= 0.0f)  // 無敵消滅
                 {
-                    foreach (var sprite in gameObject.GetComponentsInChildren<SpriteRenderer>())
-                    {
-                        sprite.enabled = true;
-                    }
+                    gameObject.GetComponent<SpriteRenderer>().enabled   = true;
+                    _BackGameObj.GetComponent<SpriteRenderer>().enabled = true;
+                    _BodyGameObj.GetComponent<SpriteRenderer>().enabled = true;
                 }
                 else    // 無敵中は体が明滅する
                 {
                     bool isEnabled = ((int)(_MutekiTimeSec * 10f) % 2) == 0;
-                    foreach (var sprite in gameObject.GetComponentsInChildren<SpriteRenderer>())
-                    {
-                        sprite.enabled = isEnabled;
-                    }
+                    gameObject.GetComponent<SpriteRenderer>().enabled   = isEnabled;
+                    _BackGameObj.GetComponent<SpriteRenderer>().enabled = isEnabled;
+                    _BodyGameObj.GetComponent<SpriteRenderer>().enabled = isEnabled;
                 }
             }
         }
@@ -186,13 +198,14 @@ namespace ssb
                 float scale = _Speed.magnitude / ParamManager.Instance.getParam<PLParam>()._ExplosionDiv;
                 explosion.transform.localScale = new Vector3(scale, scale, scale);
 
+                // ステート変更
+                _StateMachine.changeState(new PLStateShootHitToEm(this));
+
                 // ヒットストップ
                 RistrictManager.Instance.stop(ParamManager.Instance.getParam<PLParam>()._HitStopRate * _Speed.magnitude);
 
-                // ステート変更
-                _StateMachine.changeState(new PLStateShootHitToEm(this));
             }
-            else if (!(_StateMachine._CurrentState is PLStateShoot || _StateMachine._CurrentState is PLStateDeath) &&
+            else if (!(_StateMachine._CurrentState is PLStateShoot || _StateMachine._CurrentState is PLStateDeath || _StateMachine._CurrentState is PLStateShootHitToEm) &&
                  _MutekiTimeSec <= 0.0f)
             {
                 death();
@@ -210,7 +223,7 @@ namespace ssb
         {
             _Speed += speed;
         }
-        
+
         #endregion
     }
 

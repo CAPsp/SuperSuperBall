@@ -30,8 +30,10 @@ namespace ssb
 
         #region 基本
 
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
+
             // 初期化
             _Hp                 = ParamManager.Instance.getParam<Em1Param>()._Hp;
             _Speed              = Vector3.zero;
