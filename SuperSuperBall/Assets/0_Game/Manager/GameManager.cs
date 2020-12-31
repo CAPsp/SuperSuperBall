@@ -60,6 +60,9 @@ namespace ssb
             // BGM停止
             BGMManager.Instance.stopCurrentBGM();
 
+            // 最終スコアを決定
+            DataManager.Instance._GameScore = _Score;
+
             // シーン遷移
             SceneManager.Instance.changeScene(SceneManager.SceneName.Result);
         }
@@ -72,7 +75,6 @@ namespace ssb
         private void rewriteScoreText()
         {
             _ScoreText.text = $"SCORE: {_Score}";
-
         }
 
         #endregion // 非公開メソッド

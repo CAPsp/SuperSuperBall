@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace ssb
 {
-    public class UIResult : MonoBehaviour
+    public class ResultBehaviour : MonoBehaviour
     {
 
         #region 基本
