@@ -12,11 +12,20 @@ namespace ssb
 
         public Vector3 _CenterPos { private set; get; } = Vector3.zero; // ステージ中心座標
 
-        public float _Radius { private set; get; } = 25.0f;             // 円形ステージの半径
+        public float _Radius { private set; get; } = 15.0f;             // 円形ステージの半径
 
         #endregion // プロパティ
 
         #region 公開メソッド
+
+        /// <summary>
+        /// 渡された引数の座標がステージ内に存在するか
+        /// </summary>
+        public bool checkInStage(Vector3 pos)
+        {
+            pos -= _CenterPos;
+            return (pos.magnitude < _Radius);
+        }
 
         /// <summary>
         /// 引数渡されたキャラクタがステージ外に存在するかを計算

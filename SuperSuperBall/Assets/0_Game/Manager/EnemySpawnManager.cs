@@ -17,6 +17,9 @@ namespace ssb
         // スポーンに要するループ回数の上限
         private static readonly int UPPER_LIMIT_OF_SPAWN_LOOP_CNT = 10;
 
+        // ゲーム中に存在できる敵数の上限
+        private static readonly int UPPER_LIMIT_ENEMY_NUM = 600;
+
         #endregion
 
         #region フィールド
@@ -30,7 +33,9 @@ namespace ssb
         private List<GameObject>_EmPrefabList = null;
 
         private float _SpawnSecTimer = 0f;  // 敵スポーンタイマー
-        private float _SpawnInterval = 2f;  // 敵スポーンまでの時間（だんだん短くなる）
+        private float _SpawnInterval = 3f;  // 敵スポーンまでの時間（だんだん短くなる）
+
+        private int _SpawnCnt = 0;          // 生成された敵の数
 
         #endregion // フィールド
 
@@ -40,6 +45,9 @@ namespace ssb
         {
             // 一時停止管理マネージャーに登録
             RistrictManager.Instance.registerBehaviour(this);
+
+            // 初期化
+            _SpawnCnt = 0;
         }
 
         private void Update()
@@ -71,19 +79,51 @@ namespace ssb
                 }
                 else
                 {
-                    Instantiate
-                        (
-                            _EmPrefabList[0],
-                            spawnPos,
-                            Quaternion.identity,
-                            _InstObj.transform
-                        );
+                    emSpawn(0, (_SpawnCnt / 20) + 1, spawnPos);
                 }
 
                 _SpawnSecTimer = _SpawnInterval;
+                _SpawnInterval = Mathf.Clamp(3f - _SpawnCnt / 100f, 0.5f, 3f);
             }
         }
 
         #endregion // 基本
+
+        #region 非公開メソッド
+
+        // 敵スポーン処理メソッド
+        private void emSpawn(int index, int num, Vector3 spawnCenterPos)
+        {
+            // 存在できる敵上限を超得ている場合はこれ以上スポーンさせない
+            if (_InstObj.GetComponentsInChildren<Transform>().Length > UPPER_LIMIT_ENEMY_NUM)
+            {
+                return;
+            }
+
+            // 最大スポーン数は超えないように調整する
+            num = (num > 8) ? 8 : num;
+
+            Vector3 spawnPos;
+            float theta = 0f;
+            float len   = 1f;
+            for(int i = 0; i < num; i++)
+            {
+                theta       = Mathf.PI / 4f * (float)i;
+                spawnPos    = spawnCenterPos + new Vector3(len * Mathf.Cos(theta), len * Mathf.Sin(theta), 0f);
+                Instantiate
+                    (
+                        _EmPrefabList[index],
+                        spawnPos,
+                        Quaternion.identity,
+                        _InstObj.transform
+                    );
+
+            }
+
+            _SpawnCnt += num;
+        }
+
+        #endregion // 非公開メソッド
+
     }
 }

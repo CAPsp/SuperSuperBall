@@ -12,6 +12,9 @@ namespace ssb.param
         // 弾生成インターバル
         public float _ShotGenIntervalSec    = 0f;
 
+        // 生成される弾の速度
+        public float _ShotSpeed             = 0f;
+
         // この速度量より上の場合は吹っ飛ばされている
         public float _NotControllSpeedLimit = 0f;
 

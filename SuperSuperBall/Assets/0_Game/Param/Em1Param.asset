@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _SpeedResistance: 1
   _ShotGenIntervalSec: 1
+  _ShotSpeed: 5
   _NotControllSpeedLimit: 10
   _MutekiTimeSec: 0.05
   _Hp: 2
@@ -21,5 +22,5 @@ MonoBehaviour:
   _TimeSecOfReHitSameObj: 0.5
   _MoveSpeedSec: 2
   _DeathDelaySec: 0.3
-  _LimitDistFromPL: 8
+  _LimitDistFromPL: 6
   _BaseScore: 10

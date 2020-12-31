@@ -34,7 +34,7 @@ namespace ssb.state
             _ShotGenTimerSec += Time.deltaTime;
             if (_ShotGenTimerSec >= ParamManager.Instance.getParam<Em1Param>()._ShotGenIntervalSec)
             {
-                if (GameObject.FindGameObjectWithTag("Player") != null)
+                if (PLManager.Instance._CurrentPLObj != null)
                 {
                     Vector3 angle = ((PLManager.Instance._CurrentPLObj.transform.position + Unity2DUtil.genRandomVector2(1.0f)) - _Owner.transform.position).normalized;
 
@@ -42,7 +42,7 @@ namespace ssb.state
                         (
                             new Vector2(_Owner.transform.position.x, _Owner.transform.position.y),
                             new Vector2(angle.x, angle.y),
-                            1.5f
+                            ParamManager.Instance.getParam<Em1Param>()._ShotSpeed
                         );
 
                     _ShotGenTimerSec = 0.0f;
