@@ -22,3 +22,4 @@ MonoBehaviour:
   _MoveSpeedSec: 2
   _DeathDelaySec: 0.3
   _LimitDistFromPL: 8
+  _BaseScore: 10

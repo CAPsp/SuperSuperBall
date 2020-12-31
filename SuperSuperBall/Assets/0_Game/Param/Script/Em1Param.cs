@@ -35,5 +35,8 @@ namespace ssb.param
 
         // PLに近づく距離上限
         public float _LimitDistFromPL       = 0f;
+
+        // 倒されたときの基本スコア
+        public int _BaseScore               = 0;
     }
 }

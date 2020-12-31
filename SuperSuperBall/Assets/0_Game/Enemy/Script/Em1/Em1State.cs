@@ -154,6 +154,7 @@ namespace ssb.state
             // HPが0以下で死亡する
             if (_Owner._Hp <= 0)
             {
+                GameManager.Instance.addScore(ParamManager.Instance.getParam<Em1Param>()._BaseScore);
                 GameObject.Destroy(_Owner.gameObject);
             }
         }
