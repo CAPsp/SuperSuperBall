@@ -14,25 +14,13 @@ namespace ssb.state
             _Owner = owner;
         }
 
-        public override void enter()
-        {
-
-        }
-
         public override void update()
         {
-            _Owner.move(InputManager.Instance.axisX, InputManager.Instance.axisY);
-
-            if( InputManager.Instance.Hold == InputManager.KeyState.Down &&
+            if( InputManager.Instance.Hold == InputManager.KeyState.Hold &&
                 _Owner._MutekiTimeSec <= 0f)
             {
                 _Owner._StateMachine.changeState(new PLStateCharge(_Owner));
             }
-        }
-
-        public override void exit()
-        {
-
         }
     }
 
@@ -152,20 +140,13 @@ namespace ssb.state
         {
             _Owner.shot();
 
-            // 多少自由が利く速度になったらコントローラ入力を受け付ける
-            if (_Owner._Speed.magnitude < ParamManager.Instance.getParam<PLParam>()._BitControllSpeedLimit)
+            // 解放後は任意の位置で止められる
+            if (InputManager.Instance.Hold == InputManager.KeyState.Down)
             {
-                _Owner.addSpeed(new Vector3(InputManager.Instance.axisX * Time.deltaTime, InputManager.Instance.axisY * Time.deltaTime, 0.0f));
-
-                if (_Owner._Speed.magnitude < ParamManager.Instance.getParam<PLParam>()._FreeControllSpeedLimit)
-                {
-                    _Owner._MutekiTimeSec = (_Owner._MutekiTimeSec <= 0f) ? ParamManager.Instance.getParam<PLParam>()._MutekiTimeSec : _Owner._MutekiTimeSec;
-                    _Owner._StateMachine.changeState(new PLStateNormal(_Owner));
-                }
+               _Owner.resetSpeed();
+               _Owner._StateMachine.changeState(new PLStateNormal(_Owner));
             }
         }
-
-        public override void exit(){}
     }
 
     // 攻撃中に敵にヒットした場合
@@ -178,8 +159,6 @@ namespace ssb.state
             _Owner = owner;
             _Owner._ShotGuideArrowBehaviour.setState(PLShotGuideArrowBehaviour.ArrowState.Reflect);
         }
-
-        public override void enter(){}
 
         public override void update()
         {
@@ -235,8 +214,5 @@ namespace ssb.state
             }
         }
 
-        public override void exit()
-        {
-        }
     }
 }

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _SpeedResistance: 1
   _ShotGenIntervalSec: 1
-  _ShotSpeed: 2
+  _ShotSpeed: 1
   _NotControllSpeedLimit: 10
   _MutekiTimeSec: 0.05
   _Hp: 2
