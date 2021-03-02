@@ -57,6 +57,10 @@ namespace ssb.state
             }
         }
 
+        public override void exit()
+        {
+
+        }
     }
 
     // ダメージを受けたとき

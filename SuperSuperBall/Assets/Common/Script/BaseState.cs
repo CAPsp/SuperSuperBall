@@ -12,13 +12,13 @@ namespace ssb
         #region 公開メソッド
 
         // 開始メソッド
-        public virtual void enter() { }
+        public abstract void enter();
 
         // 更新時
         public abstract void update();
 
         // 終了メソッド
-        public virtual void exit() { }
+        public abstract void exit();
 
         #endregion
 
