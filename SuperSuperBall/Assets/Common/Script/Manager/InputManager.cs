@@ -34,6 +34,12 @@ namespace ssb
         // PLの操作
         public KeyState Hold { get; private set; }
 
+        // --------------------------
+        // マウス関連
+        public Vector3 mousePos { get; private set; }
+
+        public KeyState mouseMainBtn    { get; private set; }
+
         #endregion
 
         #region 基本
@@ -53,17 +59,36 @@ namespace ssb
             axisY = Input.GetAxis("Vertical");
 
             Hold = convertButtonState("Hold");
+
+            mousePos        = Input.mousePosition;
+
+            mouseMainBtn    = convertMouseBtnState(0);
         }
 
         #endregion // 基本
 
         #region 非公開メソッド
 
+        /// <summary>
+        /// キーボードの入力を状態に変換
+        /// </summary>
         private KeyState convertButtonState(string buttonName)
         {
             if (Input.GetButtonDown(buttonName))    { return KeyState.Down; }
-            else if (Input.GetButtonUp(buttonName)) { return KeyState.Up; }
+            else if (Input.GetButtonUp(buttonName)) { return KeyState.Up;   }
             else if (Input.GetButton(buttonName))   { return KeyState.Hold; }
+
+            return KeyState.None;
+        }
+
+        /// <summary>
+        /// マウスボタンの入力を状態に変換
+        /// </summary>
+        private KeyState convertMouseBtnState(int btnID)
+        {
+            if (Input.GetMouseButtonDown(btnID))    { return KeyState.Down; }
+            else if (Input.GetMouseButtonUp(btnID)) { return KeyState.Up;   }
+            else if (Input.GetMouseButton(btnID))   { return KeyState.Hold; }
 
             return KeyState.None;
         }
