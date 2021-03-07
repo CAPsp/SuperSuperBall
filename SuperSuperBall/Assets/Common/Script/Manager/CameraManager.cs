@@ -75,6 +75,22 @@ namespace ssb
             return (bottomLeft.x < pos.x) && (pos.x < topRight.x) && (bottomLeft.y < pos.y) && (pos.y < topRight.y);
         }
 
+        /// <summary>
+        /// 座標変換：ワールド -> スクリーン
+        /// </summary>
+        public Vector3 worldToScreenPoint(Vector3 worldPos)
+        {
+            return _MainCamera.WorldToScreenPoint(worldPos);
+        }
+
+        /// <summary>
+        /// 座標変換：スクリーン -> ワールド
+        /// </summary>
+        public Vector3 screenToWorldPoint(Vector3 screenPos)
+        {
+            return _MainCamera.ScreenToWorldPoint(screenPos);
+        }
+
         #endregion // 公開メソッド
     }
 }

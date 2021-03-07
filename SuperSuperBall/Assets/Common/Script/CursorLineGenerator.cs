@@ -14,10 +14,10 @@ namespace ssb
         #region 定数
 
         // 線を書いているとき、座標を保存する更新頻度
-        private static readonly float POS_UPDATE_INTERVAL_SEC = 0.1f;
+        private static readonly float POS_UPDATE_INTERVAL_SEC = 0.05f;
 
         // 座標保存数
-        private static readonly int SAVE_POS_NUM = 100;
+        private static readonly int SAVE_POS_NUM = 50;
 
         #endregion // 定数
 
@@ -34,7 +34,7 @@ namespace ssb
         private Vector3 _LineStartPoint;
 
         // 保存している座標
-        private Queue<Vector3> _SavePosQueue;
+        private ssb.Collections.FixedQueue<Vector3> _SavePosFixedQueue;
 
         // タイマー
         private float _TimerSec;
@@ -48,9 +48,9 @@ namespace ssb
         void Start()
         {
             // 初期化
-            _IsDrawing      = false;
-            _SavePosQueue   = new Queue<Vector3>(SAVE_POS_NUM);
-            _TimerSec       = 0f;
+            _IsDrawing          = false;
+            _SavePosFixedQueue  = new ssb.Collections.FixedQueue<Vector3>(SAVE_POS_NUM);
+            _TimerSec           = 0f;
 
             _LineRenderer   = GetComponent<LineRenderer>();
         }
@@ -65,7 +65,7 @@ namespace ssb
                 if(InputManager.Instance.mouseMainBtn == InputManager.KeyState.Down)
                 {
                     _LineStartPoint = InputManager.Instance.mousePos;
-                    _SavePosQueue.Enqueue(_LineStartPoint);
+                    _SavePosFixedQueue.Enqueue(_LineStartPoint);
 
                     _TimerSec   = 0f;
                     _IsDrawing  = true;
@@ -77,19 +77,19 @@ namespace ssb
                 _TimerSec += Time.deltaTime;
                 if(_TimerSec >= POS_UPDATE_INTERVAL_SEC)
                 {
-                    _SavePosQueue.Enqueue(InputManager.Instance.mousePos);
+                    _SavePosFixedQueue.Enqueue(InputManager.Instance.mousePos);
                     _TimerSec = 0f;
                 }
 
                 // 線の描画
-                _LineRenderer.positionCount = _SavePosQueue.Count;
-                _LineRenderer.SetPositions(_SavePosQueue.ToArray());
+                _LineRenderer.positionCount = _SavePosFixedQueue.Count;
+                _LineRenderer.SetPositions(_SavePosFixedQueue.ToArray());
 
                 // 線引き終了
                 if (InputManager.Instance.mouseMainBtn != InputManager.KeyState.Hold)
                 {
                     // 保存した座標をクリア
-                    _SavePosQueue.Clear();
+                    _SavePosFixedQueue.Clear();
 
                     _IsDrawing = false;
                 }

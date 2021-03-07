@@ -60,7 +60,9 @@ namespace ssb
 
             Hold = convertButtonState("Hold");
 
-            mousePos        = Input.mousePosition;
+            // Z座標は考慮しない
+            mousePos        = CameraManager.Instance.screenToWorldPoint(Input.mousePosition);
+            mousePos        -= new Vector3(0f, 0f, mousePos.z);
 
             mouseMainBtn    = convertMouseBtnState(0);
         }

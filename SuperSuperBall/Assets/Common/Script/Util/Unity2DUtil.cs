@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 
-namespace ssb
+namespace ssb.util
 {
-    // Unity全般で使える２Ｄ関係の計算ユーティリティクラス
+    /// <summary>
+    /// Unity全般で使える２Ｄ関係の計算ユーティリティクラス
+    /// </summary>
     public class Unity2DUtil
     {
         // 2点間の角度を計算

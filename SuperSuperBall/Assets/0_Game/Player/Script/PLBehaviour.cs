@@ -97,7 +97,7 @@ namespace ssb
 
                 _BodyGameObj.SetActive(true);
                 _BodyGameObj.transform.localPosition    = _BackGameObj.transform.localPosition / 2.0f;
-                _BodyGameObj.transform.localRotation    = Quaternion.AngleAxis(Unity2DUtil.CalcAngle2D(Vector2.zero, _BackGameObj.transform.localPosition), Vector3.forward);
+                _BodyGameObj.transform.localRotation    = Quaternion.AngleAxis(util.Unity2DUtil.CalcAngle2D(Vector2.zero, _BackGameObj.transform.localPosition), Vector3.forward);
                 _BodyGameObj.transform.localScale       = new Vector3(distFaceToBody * 2.0f, 1.0f, 1.0f);
             }
 

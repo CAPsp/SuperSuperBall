@@ -36,7 +36,7 @@ namespace ssb.state
             {
                 if (PLManager.Instance._CurrentPLObj != null)
                 {
-                    Vector3 angle = ((PLManager.Instance._CurrentPLObj.transform.position + Unity2DUtil.genRandomVector2(1.0f)) - _Owner.transform.position).normalized;
+                    Vector3 angle = ((PLManager.Instance._CurrentPLObj.transform.position + util.Unity2DUtil.genRandomVector2(1.0f)) - _Owner.transform.position).normalized;
 
                     EnemyShotManager.Instance.shotGen
                         (
