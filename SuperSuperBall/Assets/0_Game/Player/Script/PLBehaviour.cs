@@ -6,7 +6,6 @@ using ssb.state;
 
 namespace ssb
 {
-
     // PLの操作
     public class PLBehaviour : CharaBaseBehaviour
     {
@@ -17,9 +16,6 @@ namespace ssb
         // 無敵中の時間(setは無敵時間が切れたときのみ行える)
         public float _MutekiTimeSec { set; get; }
 
-        // PL子要素に存在するPL背面描画用GameObject
-        public GameObject _BackGameObj { private set; get; }
-
         // PL子要素に存在するPLアクション補佐するガイド矢印制御Behaviour
         public PLShotGuideArrowBehaviour _ShotGuideArrowBehaviour { private set; get; }
 
@@ -27,12 +23,7 @@ namespace ssb
 
         #region メンバ変数
 
-        // PLの子要素に存在するPL体描画用GameObject
-        private GameObject _BodyGameObj;
-
-        // 状態に合わせて使い分けるコライダ
         private CircleCollider2D _CricleCollider;
-        private EdgeCollider2D _EdgeCollider;
 
         #endregion // メンバ変数
 
@@ -42,24 +33,17 @@ namespace ssb
         {
             base.Start();
 
-            // -------------------------------
-            // 各種コンポーネント取得
-            _BodyGameObj                = gameObject.transform.Find("Body").gameObject;
-            _BackGameObj                = gameObject.transform.Find("Back").gameObject;
-
             // 矢印ガイド制御Behaviourの取得と設定
             _ShotGuideArrowBehaviour    = gameObject.transform.GetComponentInChildren<PLShotGuideArrowBehaviour>();
             if(_ShotGuideArrowBehaviour != null)
             {
                 _ShotGuideArrowBehaviour.registerPLBehaviour(this);
             }
-
-
             _CricleCollider = GetComponent<CircleCollider2D>();
-            _EdgeCollider   = GetComponent<EdgeCollider2D>();
 
             // 初期化
-            _Speed              = Vector3.zero;
+            float randTheta = Random.value * Mathf.PI * 2f;
+            _Speed          = new Vector3(Mathf.Sign(randTheta), Mathf.Cos(randTheta), 0f) * ParamManager.Instance.getParam<PLParam>()._IgnoreSpeedLimit;
             _StateMachine       = new StateMachine(new PLStateNormal(this), this);
             _MutekiTimeSec      = ParamManager.Instance.getParam<PLParam>()._MutekiTimeSec;
             _CollAttackPower    = 2;
@@ -74,42 +58,19 @@ namespace ssb
             // ----------------------------------------------------------
             // ステートに依存しない処理(常時必要な処理等)は以下に記述
 
-            // 体が伸びていたら。コライダを切り替えて体を描画する
-            float distFaceToBody = Vector3.Distance(_BackGameObj.transform.position, gameObject.transform.position);
-            if(distFaceToBody < _EdgeCollider.edgeRadius)
+            // 一定速度以上であれば速度の減算
+            if(_Speed.sqrMagnitude > ParamManager.Instance.getParam<PLParam>()._IgnoreSpeedLimit)
             {
-                _CricleCollider.enabled = true;
-                _EdgeCollider.enabled   = false;
-                _BodyGameObj.SetActive(false);
-                _BodyGameObj.transform.localPosition = Vector3.zero;
-                _BodyGameObj.transform.localRotation = Quaternion.identity;
-            }
-            else
-            {
-                _CricleCollider.enabled = false;
-                _EdgeCollider.enabled   = true;
+                _Speed -= new Vector3(
+                    _Speed.x * Time.deltaTime * ParamManager.Instance.getParam<PLParam>()._SpeedResistance,
+                    _Speed.y * Time.deltaTime * ParamManager.Instance.getParam<PLParam>()._SpeedResistance,
+                    0f
+                );
 
-                Vector2[] setPoints = new Vector2[]{
-                    Vector2.zero,
-                    new Vector2(_BackGameObj.transform.localPosition.x, _BackGameObj.transform.localPosition.y)
-                };
-                _EdgeCollider.points = setPoints;
-
-                _BodyGameObj.SetActive(true);
-                _BodyGameObj.transform.localPosition    = _BackGameObj.transform.localPosition / 2.0f;
-                _BodyGameObj.transform.localRotation    = Quaternion.AngleAxis(util.Unity2DUtil.CalcAngle2D(Vector2.zero, _BackGameObj.transform.localPosition), Vector3.forward);
-                _BodyGameObj.transform.localScale       = new Vector3(distFaceToBody * 2.0f, 1.0f, 1.0f);
-            }
-
-            // 速度の減算
-            _Speed -= new Vector3(
-                _Speed.x * Time.deltaTime * ParamManager.Instance.getParam<PLParam>()._SpeedResistance,
-                _Speed.y * Time.deltaTime * ParamManager.Instance.getParam<PLParam>()._SpeedResistance,
-                0f
-            );
-            if (_Speed.sqrMagnitude < ParamManager.Instance.getParam<PLParam>()._IgnoreSpeedLimit)
-            {
-                _Speed = Vector3.zero;
+                if(_Speed.sqrMagnitude <= ParamManager.Instance.getParam<PLParam>()._IgnoreSpeedLimit)
+                {
+                    _Speed = _Speed.normalized * ParamManager.Instance.getParam<PLParam>()._IgnoreSpeedLimit;
+                }
             }
 
             // 無敵時間処理
@@ -120,15 +81,11 @@ namespace ssb
                 if(_MutekiTimeSec <= 0.0f)  // 無敵消滅
                 {
                     gameObject.GetComponent<SpriteRenderer>().enabled   = true;
-                    _BackGameObj.GetComponent<SpriteRenderer>().enabled = true;
-                    _BodyGameObj.GetComponent<SpriteRenderer>().enabled = true;
                 }
                 else    // 無敵中は体が明滅する
                 {
                     bool isEnabled = ((int)(_MutekiTimeSec * 10f) % 2) == 0;
                     gameObject.GetComponent<SpriteRenderer>().enabled   = isEnabled;
-                    _BackGameObj.GetComponent<SpriteRenderer>().enabled = isEnabled;
-                    _BodyGameObj.GetComponent<SpriteRenderer>().enabled = isEnabled;
                 }
             }
         }
@@ -144,22 +101,10 @@ namespace ssb
 
         #region 非公開メソッド
 
-        // 移動
-        public void move(float x, float y)
-        {
-            gameObject.transform.position += new Vector3(x, y, 0f) * ParamManager.Instance.getParam<PLParam>()._MoveSpeedPerSec * Time.deltaTime;
-
-            // 画面外に出ないよう調整
-            Vector3 nextPos;
-            Vector3 tmpSpeed;
-            if (!(StageManager.Instance.checkCharaInStageAndCalcReturnStage(this, out nextPos, out tmpSpeed)))
-            {
-                gameObject.transform.position = nextPos;
-            }
-        }
-
-        // ショット
-        public void shot()
+        /// <summary>
+        /// 移動処理
+        /// </summary>
+        public void move()
         {
             gameObject.transform.position += _Speed * Time.deltaTime;
 
@@ -173,49 +118,18 @@ namespace ssb
             }
         }
 
-        // 死亡時の処理
-        private void death()
-        {
-            _BackGameObj.transform.localPosition = Vector3.zero;
-            _BodyGameObj.SetActive(false);
-            _BackGameObj.SetActive(false);
-
-            // ステート変更
-            _StateMachine.changeState(new PLStateDeath(this));
-        }
-
         #endregion // 非公開メソッド
 
         #region 公開メソッド
 
         public void hit(bool isEnemy = false)
         {
-            // 敵にショットして直接あたった場合
-            if(isEnemy && _StateMachine._CurrentState is PLStateShoot)
+            // 死亡時の処理
+            if (isEnemy && _MutekiTimeSec <= 0.0f)
             {
-                // 衝撃波生成
-                GameObject explosion = ParticleManager.Instance.initiateParticle(ParticleManager.ParticleName.Explosion, gameObject.transform.position);
-                float scale = _Speed.magnitude / ParamManager.Instance.getParam<PLParam>()._ExplosionDiv;
-                explosion.transform.localScale = new Vector3(scale, scale, scale);
-
                 // ステート変更
-                _StateMachine.changeState(new PLStateShootHitToEm(this));
-
-                // ヒットストップ
-                RistrictManager.Instance.stop(ParamManager.Instance.getParam<PLParam>()._HitStopRate * _Speed.magnitude);
-
+                _StateMachine.changeState(new PLStateDeath(this));
             }
-            else if (!(_StateMachine._CurrentState is PLStateShoot || _StateMachine._CurrentState is PLStateDeath || _StateMachine._CurrentState is PLStateShootHitToEm) &&
-                 _MutekiTimeSec <= 0.0f)
-            {
-                death();
-            }
-        }
-
-        // 固定するローカル座標を設定
-        public void setFixedLocalPos(Vector3 localPos)
-        {
-            _BackGameObj.transform.localPosition = localPos;
         }
 
         // スピードを加算する

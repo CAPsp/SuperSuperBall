@@ -91,16 +91,12 @@ namespace ssb
             {
                 PLBehaviour pl = collision.gameObject.GetComponent<PLBehaviour>();
 
-                // PLから攻撃されたら吹っ飛ばされてHPが減る
-                if (pl._StateMachine._CurrentState is PLStateShoot)
-                {
-                    SEManager.Instance.playSE(SEManager.SEName.Hit);
-                    _Speed = collision.gameObject.GetComponent<PLBehaviour>()._Speed;
-                    damage(pl._CollAttackPower);
+                SEManager.Instance.playSE(SEManager.SEName.Hit);
+                _Speed = collision.gameObject.GetComponent<PLBehaviour>()._Speed;
+                damage(pl._CollAttackPower);
 
-                    // パーティクル
-                    ParticleManager.Instance.initiateParticle(ParticleManager.ParticleName.Hit, collision.contacts[0].point);
-                }
+                // パーティクル
+                ParticleManager.Instance.initiateParticle(ParticleManager.ParticleName.Hit, collision.contacts[0].point);
 
                 collision.gameObject.GetComponent<PLBehaviour>().hit(true);
             }

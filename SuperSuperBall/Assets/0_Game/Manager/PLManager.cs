@@ -54,7 +54,6 @@ namespace ssb
         private void spawn(Vector3 pos)
         {
              _CurrentPLObj = Instantiate(_PLPrefab, pos, Quaternion.identity, _PLInstObj.transform);
-            CameraManager.Instance.registerTargetObj(_CurrentPLObj);
         }
 
         #endregion // 非公開メソッド

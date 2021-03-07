@@ -56,11 +56,6 @@ namespace ssb.state
                 _Owner.addSpeed(move);
             }
         }
-
-        public override void exit()
-        {
-
-        }
     }
 
     // ダメージを受けたとき
